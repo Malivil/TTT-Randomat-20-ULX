@@ -25,7 +25,7 @@ function EVENT:GetConVars()
     end
 
     local checks = {}
-	for _, v in pairs({"checkbox"}) do
+    for _, v in pairs({"checkbox"}) do
         local name = "randomat_" .. self.id .. "_" .. v
         if ConVarExists(name) then
             local convar = GetConVar(name)
@@ -35,7 +35,7 @@ function EVENT:GetConVars()
             })
         end
     end
-	
+    
     return sliders, checks
 end
 ```
