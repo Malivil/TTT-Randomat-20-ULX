@@ -3,7 +3,7 @@
 ``` lua
 CreateConVar("randomat_example_slider", 2, {FCVAR_NOTIFY, FCVAR_ARCHIVE}, "Small slider", 1, 10)
 CreateConVar("randomat_example_slider2", 200, {FCVAR_NOTIFY, FCVAR_ARCHIVE}, "Large slider", 0, 1000)
-CreateConVar("randomat_example_checkbox", 60, {FCVAR_NOTIFY, FCVAR_ARCHIVE}, "Checkbox", 1, 600)
+CreateConVar("randomat_example_checkbox", 60, {FCVAR_NOTIFY, FCVAR_ARCHIVE}, "Checkbox")
 
 EVENT.Title = "An example implementation of GetConVars"
 EVENT.id = "example"
