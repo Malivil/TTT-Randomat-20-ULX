@@ -648,7 +648,7 @@ events["suicide"].name = "So that's it. What, we some kind of suicide squad?"
 --[suspicion]--------------------------------------------------
 
 events["suspicion"] = {}
-events["suspicion"].name = "player is acting suspicious..."
+events["suspicion"].name = "A player is acting suspicious..."
 
 if ToT then
 	events["suspicion"].sdr = {}

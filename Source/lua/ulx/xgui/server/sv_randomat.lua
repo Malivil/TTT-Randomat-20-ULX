@@ -140,12 +140,38 @@ hook.Add("Initialize", "InitRandomatULXEventTransfer", function()
     for _, v in pairs(Randomat.Events) do
         local convar = "ttt_randomat_" .. v.id
         if not table.HasValue(commands, convar) then
+            local sliders, checks;
+            if v.GetConVars then
+                sliders, checks = v:GetConVars()
+            end
+
+            local title = v.Title
+            if title == "" then
+                title = v.AltTitle
+            end
             newevents[v.id] = {
-                name = v.Title
+                name = title,
+                sdr = sliders,
+                chk = checks
             }
+
             table.insert(commands, convar)
             if ConVarExists(convar) then
                 ULib.replicatedWritableCvar( convar, "rep_"..convar, GetConVarNumber( convar ), false, false, "xgui_gmsettings" )
+            end
+
+            for _, cv in pairs(sliders or {}) do
+                local cmd = "randomat_"..v.id.."_"..cv.cmd
+                if ConVarExists(cmd) then
+                    ULib.replicatedWritableCvar( cmd, "rep_" .. cmd, GetConVarNumber( cmd ), false, false, "xgui_gmsettings" )
+                end
+            end
+
+            for _, cv in pairs(checks or {}) do
+                local cmd = "randomat_"..v.id.."_"..cv.cmd
+                if ConVarExists(cmd) then
+                    ULib.replicatedWritableCvar( cmd, "rep_" .. cmd, GetConVarNumber( cmd ), false, false, "xgui_gmsettings" )
+                end
             end
         end
     end
