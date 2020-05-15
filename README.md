@@ -31,7 +31,7 @@ function EVENT:GetConVars()
             local convar = GetConVar(name)
             table.insert(checks, {
                 cmd = v,                    -- The command extension (e.g. everything after "randomat_example_"
-                dsc = convar:GetHelpText() -- The description of the ConVar
+                dsc = convar:GetHelpText()  -- The description of the ConVar
             })
         end
     end
