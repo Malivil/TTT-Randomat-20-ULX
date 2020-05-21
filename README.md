@@ -15,7 +15,7 @@ function EVENT:GetConVars()
         if ConVarExists(name) then
             local convar = GetConVar(name)
             table.insert(sliders, {
-                cmd = v,                    -- The command extension (e.g. everything after "randomat_example_"
+                cmd = v,                    -- The command extension (e.g. everything after "randomat_example_")
                 dsc = convar:GetHelpText(), -- The description of the ConVar
                 min = convar:GetMin(),      -- The minimum value for this slider-based ConVar
                 max = convar:GetMax(),      -- The maximum value for this slider-based ConVar
@@ -30,7 +30,7 @@ function EVENT:GetConVars()
         if ConVarExists(name) then
             local convar = GetConVar(name)
             table.insert(checks, {
-                cmd = v,                    -- The command extension (e.g. everything after "randomat_example_"
+                cmd = v,                    -- The command extension (e.g. everything after "randomat_example_")
                 dsc = convar:GetHelpText()  -- The description of the ConVar
             })
         end
