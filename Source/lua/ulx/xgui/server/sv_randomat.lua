@@ -140,9 +140,9 @@ hook.Add("Initialize", "InitRandomatULXEventTransfer", function()
     for _, v in pairs(Randomat.Events) do
         local convar = "ttt_randomat_" .. v.id
         if not table.HasValue(commands, convar) then
-            local sliders, checks;
+            local sliders, checks, textboxes;
             if v.GetConVars then
-                sliders, checks = v:GetConVars()
+                sliders, checks, textboxes = v:GetConVars()
             end
 
             local title = v.Title
@@ -152,7 +152,8 @@ hook.Add("Initialize", "InitRandomatULXEventTransfer", function()
             newevents[v.id] = {
                 name = title,
                 sdr = sliders,
-                chk = checks
+                chk = checks,
+                txt = textboxes
             }
 
             table.insert(commands, convar)
@@ -160,17 +161,19 @@ hook.Add("Initialize", "InitRandomatULXEventTransfer", function()
                 ULib.replicatedWritableCvar( convar, "rep_"..convar, GetConVarNumber( convar ), false, false, "xgui_gmsettings" )
             end
 
-            for _, cv in pairs(sliders or {}) do
+            local numeric = table.Add(table.Add({}, sliders or {}), checks or {})
+            for _, cv in pairs(numeric) do
                 local cmd = "randomat_"..v.id.."_"..cv.cmd
                 if ConVarExists(cmd) then
                     ULib.replicatedWritableCvar( cmd, "rep_" .. cmd, GetConVarNumber( cmd ), false, false, "xgui_gmsettings" )
                 end
             end
 
-            for _, cv in pairs(checks or {}) do
+            for _, cv in pairs(textboxes or {}) do
                 local cmd = "randomat_"..v.id.."_"..cv.cmd
+                print(cmd)
                 if ConVarExists(cmd) then
-                    ULib.replicatedWritableCvar( cmd, "rep_" .. cmd, GetConVarNumber( cmd ), false, false, "xgui_gmsettings" )
+                    ULib.replicatedWritableCvar( cmd, "rep_" .. cmd, GetConVarString( cmd ), false, false, "xgui_gmsettings" )
                 end
             end
         end

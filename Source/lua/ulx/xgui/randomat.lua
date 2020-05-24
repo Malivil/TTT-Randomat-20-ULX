@@ -835,10 +835,9 @@ local function loadRandomatULXEvents(eventsULX)
         lst:AddItem( enable )
 
         local elements = 1
-
         if v.sdr ~= nil then
             for _, j in pairs(v.sdr) do
-                local conslider = xlib.makeslider{label=j.dsc, repconvar="rep_randomat_"..k.."_"..j.cmd, min=j.min,max=j.max,decimal=j.dcm or 0, parent=lst}
+                local conslider = xlib.makeslider{label=j.dsc, repconvar="rep_randomat_"..k.."_"..j.cmd, min=j.min, max=j.max, decimal=j.dcm or 0, parent=lst}
                 lst:AddItem(conslider)
                 elements = elements + 1
             end
@@ -852,8 +851,19 @@ local function loadRandomatULXEvents(eventsULX)
             end
         end
 
-        xlib.makebutton{y = (25*elements) - 5, w=150, label="Trigger Event", parent=lst }.DoClick=function()
-            RunConsoleCommand("ttt_randomat_trigger",k)
+        if v.txt ~= nil then
+            for _, j in pairs(v.txt) do
+                local labeltxt = xlib.makelabel{label=j.dsc, parent=lst}
+                lst:AddItem(labeltxt)
+                elements = elements+1
+                local contxt = xlib.maketextbox{repconvar="rep_randomat_"..k.."_"..j.cmd, enableinput=true, parent=lst}
+                lst:AddItem(contxt)
+                elements = elements+1
+            end
+        end
+
+        xlib.makebutton{y = (25*elements) - 5, w=150, label="Trigger Event", parent=lst}.DoClick=function()
+            RunConsoleCommand("ttt_randomat_trigger", k)
         end
 
         xgui.hookEvent( "onProcessModules", nil, pnl.processModules )
