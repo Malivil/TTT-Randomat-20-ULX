@@ -20,7 +20,6 @@ local function init()
         table.insert(commands, "ttt_randomat_freeze")
         table.insert(commands, "ttt_randomat_gas")
         table.insert(commands, "ttt_randomat_gungame")
-        table.insert(commands, "ttt_randomat_harpoon")
         table.insert(commands, "ttt_randomat_intensifies")
         table.insert(commands, "ttt_randomat_lifesteal")
         table.insert(commands, "ttt_randomat_malfunction")
@@ -39,7 +38,6 @@ local function init()
         table.insert(commands, "ttt_randomat_sosig")
         table.insert(commands, "ttt_randomat_soulmates")
         table.insert(commands, "ttt_randomat_suddendeath")
-        table.insert(commands, "ttt_randomat_suicide")
         table.insert(commands, "ttt_randomat_switch")
         table.insert(commands, "ttt_randomat_texplode")
         table.insert(commands, "ttt_randomat_visualiser")
@@ -72,8 +70,6 @@ local function init()
         table.insert(commands, "randomat_gas_incendiary")
         table.insert(commands, "randomat_gas_smoke")
         table.insert(commands, "randomat_gungame_timer")
-        table.insert(commands, "randomat_harpoon_timer")
-        table.insert(commands, "randomat_harpoon_strip")
         table.insert(commands, "randomat_intensifies_timer")
         table.insert(commands, "randomat_lifesteal_health")
         table.insert(commands, "randomat_lifesteal_cap")
@@ -145,12 +141,9 @@ hook.Add("Initialize", "InitRandomatULXEventTransfer", function()
                 sliders, checks, textboxes = v:GetConVars()
             end
 
-            local title = v.Title
-            if title == "" then
-                title = v.AltTitle
-            end
             newevents[v.id] = {
-                name = title,
+                name = v.Title,
+                altname = v.AltTitle,
                 sdr = sliders,
                 chk = checks,
                 txt = textboxes
@@ -227,43 +220,6 @@ net.Receive("rdmtreset", function()
      for k, v in pairs(player.GetAll()) do
         v:PrintMessage(HUD_PRINTTALK, "Reset configs to deafult values")
     end
-end)
-
-net.Receive("FindRandomatAddons", function()
-    net.Start("FindRandomatAddons")
-    if ConVarExists("ttt_randomat_oldjester") then
-        print("ToT Enabled")
-        net.WriteBool(true)
-    else
-        net.WriteBool(false)
-        print("ToT not Enabled")
-    end
-
-    if ConVarExists("ttt_randomat_bees") then
-        net.WriteBool(true)
-        print("Bees Enabled")
-    else
-        net.WriteBool(false)
-        print("Bees not Enabled")
-    end
-
-    if ConVarExists("ttt_randomat_blink") then
-        net.WriteBool(true)
-        print("Angels Enabled")
-    else
-        net.WriteBool(false)
-        print("Angels not Enabled")
-    end
-
-    if ConVarExists("ttt_randomat_harpoon") then
-        net.WriteBool(true)
-        print("Harpoon Enabled")
-    else
-        net.WriteBool(false)
-        print("Harpoon not Enabled")
-    end
-
-    net.Broadcast()
 end)
 
 xgui.addSVModule( "randomat", init )

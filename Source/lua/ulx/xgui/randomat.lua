@@ -32,13 +32,13 @@ function randomat_settings.processModules()
 		if module.mtype == "randomat_settings" and ( not module.access or LocalPlayer():query( module.access ) ) then
 			local w,h = module.panel:GetSize()
 			if w == h and h == 0 then module.panel:SetSize( 275, 322 ) end
-			
+
 			if module.panel.scroll then --For DListLayouts
 				module.panel.scroll.panel = module.panel
 				module.panel = module.panel.scroll
 			end
 			module.panel:SetParent( randomat_settings.panel )
-			
+
 			local line = randomat_settings.catList:AddLine( module.name, i )
 			if ( module.panel == randomat_settings.curPanel ) then
 				randomat_settings.curPanel = nil
@@ -60,7 +60,6 @@ local events = {}
 local Bees = 1
 local ToT = 1
 local Angels = 1
-local Poon = 1
 
 --[ammo]--------------------------------------------------
 
@@ -116,6 +115,7 @@ end
 
 events["blind"] = {}
 events["blind"].name = "All traitors have been blinded"
+events["blind"].altname = "Blind Traitors"
 events["blind"].sdr = {}
 
 slider = events["blind"].sdr
@@ -128,14 +128,14 @@ slider[1].min = 5
 --[blink]--------------------------------------------------
 
 events["blink"] = {}
-events["blink"].name = "Don't Blink."
+events["blink"].name = "Don't. Blink."
 events["blink"].sdr = {}
 
 if Angels then
 	slider = events["blink"].sdr
 	slider[1] = {}
 	slider[1].cmd = "cap"
-	slider[1].dsc = "Max angel spawns (def. 12, 0 to disable)"
+	slider[1].dsc = "Max angel spawns (def. 12)"
 	slider[1].max = 20
 	slider[1].min = 0
 
@@ -261,7 +261,7 @@ slider[1].min = 10
 --[falldamage]--------------------------------------------------
 
 events["falldamage"] = {}
-events["falldamage"].name = "No more Falldamage!"
+events["falldamage"].name = "No more Fall Damage!"
 
 --[flash]--------------------------------------------------
 
@@ -376,31 +376,6 @@ slider[1].dsc = "Timer (def. 5)"
 slider[1].min = "1"
 slider[1].max = "30"
 
---[harpoon]--------------------------------------------------
-
-events["harpoon"] = {}
-events["harpoon"].name = "Harpooooooooooooooooooooon!!"
-
-events["harpoon"].chk = {}
-check = events["harpoon"].chk
-
-if Poon then
-	events["harpoon"].sdr = {}
-	slider = events["harpoon"].sdr
-	slider[1] = {}
-	slider[1].cmd = "timer"
-	slider[1].dsc = "Timer (def. 3)"
-	slider[1].min = "1"
-	slider[1].max = "30"
-
-	check[1] = {}
-	check[1].cmd = "strip"
-	check[1].dsc = "Should strip other weapons (def. 1)"
-else
-	check[1].cmd = ""
-	check[1].dsc = "Subscribe to the randomat harpoon addon to enable this event!"
-end
-
 --[intensifies]--------------------------------------------------
 
 events["intensifies"] = {}
@@ -481,6 +456,7 @@ check[1].dsc = "Affect everyone (def. 0)"
 
 events["murder"] = {}
 events["murder"].name = "What gamemode is this again?"
+events["murder"].alname = "Murder"
 
 events["murder"].sdr = {}
 slider = events["murder"].sdr
@@ -580,6 +556,7 @@ slider[1].max = 10
 
 events["regeneration"] = {}
 events["regeneration"].name = "We learned how to heal over time, its hard, but definitely possible..."
+events["regeneration"].altname = "Regeneration"
 
 events["regeneration"].sdr = {}
 slider = events["regeneration"].sdr
@@ -640,11 +617,6 @@ check[1].dsc = "Give everyone a soulmate"
 events["suddendeath"] = {}
 events["suddendeath"].name = "Sudden Death!"
 
---[suicide]--------------------------------------------------
-
-events["suicide"] = {}
-events["suicide"].name = "So that's it. What, we some kind of suicide squad?"
-
 --[suspicion]--------------------------------------------------
 
 events["suspicion"] = {}
@@ -669,6 +641,7 @@ end
 
 events["switch"] = {}
 events["switch"].name = "There's this game my father taught me years ago, it's called \"Switch\""
+events["switch"].altname = "Switch"
 
 events["switch"].sdr = {}
 slider = events["switch"].sdr
@@ -823,7 +796,7 @@ slider[1].max = 300
 --------------------------------------------------------------
 
 local function loadRandomatULXEvents(eventsULX)
-	for k, v in pairs(eventsULX) do
+    for k, v in pairs(eventsULX) do
         local pnl = xlib.makelistlayout{ w=415, h=318, parent=xgui.null }
 
         local lst = vgui.Create( "DPanelList", pnl )
@@ -867,7 +840,13 @@ local function loadRandomatULXEvents(eventsULX)
         end
 
         xgui.hookEvent( "onProcessModules", nil, pnl.processModules )
-        xgui.addSubModule( v.name, pnl, nil, "randomat_settings" )
+
+        if v.name ~= "" and v.name ~= nil then
+            xgui.addSubModule( v.name, pnl, nil, "randomat_settings" )
+        end
+        if v.altname ~= "" and v.altname ~= nil then
+            xgui.addSubModule( v.altname, pnl, nil, "randomat_settings" )
+        end
     end
 end
 loadRandomatULXEvents(events)
