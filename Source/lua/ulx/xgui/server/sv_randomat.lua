@@ -200,7 +200,7 @@ end)
 
 net.Receive("rdmtclear", function()
     RunConsoleCommand("ttt_randomat_clearevents")
-    for k, v in pairs(player.GetAll()) do
+    for _, v in pairs(player.GetAll()) do
         v:PrintMessage(HUD_PRINTTALK, "Cleared all active randomat events")
         v:SetMaxHealth(100)
         v:SetHealth(100)
@@ -213,11 +213,11 @@ end)
 
 net.Receive("rdmtreset", function()
     RunConsoleCommand("ttt_randomat_clearevents")
-    for k, v in pairs(commands) do
+    for _, v in pairs(commands) do
         RunConsoleCommand(v, GetConVar(v):GetDefault())
     end
 
-     for k, v in pairs(player.GetAll()) do
+    for _, v in pairs(player.GetAll()) do
         v:PrintMessage(HUD_PRINTTALK, "Reset configs to deafult values")
     end
 end)
