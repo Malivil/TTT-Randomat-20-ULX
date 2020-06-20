@@ -820,7 +820,7 @@ local function loadRandomatULXEvents(eventsULX)
             for _, j in pairs(v.chk) do
                 local concheck = xlib.makecheckbox{label=j.dsc, repconvar="rep_randomat_"..k.."_"..j.cmd, parent=lst}
                 lst:AddItem(concheck)
-                elements = elements+1
+                elements = elements + 1
             end
         end
 
@@ -828,10 +828,10 @@ local function loadRandomatULXEvents(eventsULX)
             for _, j in pairs(v.txt) do
                 local labeltxt = xlib.makelabel{label=j.dsc, parent=lst}
                 lst:AddItem(labeltxt)
-                elements = elements+1
+                elements = elements + 1
                 local contxt = xlib.maketextbox{repconvar="rep_randomat_"..k.."_"..j.cmd, enableinput=true, parent=lst}
                 lst:AddItem(contxt)
-                elements = elements+1
+                elements = elements + 1
             end
         end
 
@@ -855,6 +855,8 @@ net.Receive("randomatULXEventsTransfer", function()
 	local importEventsJSON = net.ReadString()
 	local importedEvents = util.JSONToTable(importEventsJSON)
 	loadRandomatULXEvents(importedEvents)
+    -- Reload the modules since by this time its usually loaded already
+    xgui.processModules()
 end)
 
 -----------General-Settings----------------------
