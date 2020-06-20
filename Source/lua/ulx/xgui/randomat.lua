@@ -456,7 +456,7 @@ check[1].dsc = "Affect everyone (def. 0)"
 
 events["murder"] = {}
 events["murder"].name = "What gamemode is this again?"
-events["murder"].alname = "Murder"
+events["murder"].altname = "Murder"
 
 events["murder"].sdr = {}
 slider = events["murder"].sdr
