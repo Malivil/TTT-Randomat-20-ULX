@@ -548,7 +548,7 @@ events["randomxn"].sdr = {}
 slider = events["randomxn"].sdr
 slider[1] = {}
 slider[1].cmd = "triggers"
-slider[1].dsc = "Numer of randomats used (def. 5)"
+slider[1].dsc = "Number of randomats used (def. 5)"
 slider[1].min = 2
 slider[1].max = 10
 
