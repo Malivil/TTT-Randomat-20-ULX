@@ -679,7 +679,7 @@ events["upgrade"].chk = {}
 check = events["upgrade"].chk
 check[1] = {}
 check[1].cmd = "chooserole"
-check[1].dsc = "Player chooses Survivalist or Serial Killer"
+check[1].dsc = "Player chooses Mercenary or Killer"
 
 --[visualiser]--------------------------------------------------
 
