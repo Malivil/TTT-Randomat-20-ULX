@@ -452,28 +452,6 @@ check[1] = {}
 check[1].cmd = "afectall"
 check[1].dsc = "Affect everyone (def. 0)"
 
---[murder]--------------------------------------------------
-
-events["murder"] = {}
-events["murder"].name = "What gamemode is this again?"
-events["murder"].altname = "Murder"
-
-events["murder"].sdr = {}
-slider = events["murder"].sdr
-slider[1] = {}
-slider[1].cmd = "pickups_pct"
-slider[1].dsc = "Pickups for gun multiplier (def. 1.5)"
-slider[1].min = 1
-slider[1].max = 5
-slider[1].decimal = 2
-
-slider[2] = {}
-slider[2].cmd = "knifespeed"
-slider[2].dsc = "Speed when holding knife (def. 1.2)"
-slider[2].min = 1
-slider[2].max = 2
-slider[2].dcm = 1
-
 --[mayhem]--------------------------------------------------
 
 events["mayhem"] = {}
