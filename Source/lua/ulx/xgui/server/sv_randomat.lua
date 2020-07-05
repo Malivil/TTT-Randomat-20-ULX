@@ -161,7 +161,6 @@ hook.Add("Initialize", "InitRandomatULXEventTransfer", function()
 
             for _, cv in pairs(textboxes or {}) do
                 local cmd = "randomat_"..v.id.."_"..cv.cmd
-                print(cmd)
                 if ConVarExists(cmd) then
                     ULib.replicatedWritableCvar( cmd, "rep_" .. cmd, GetConVarString( cmd ), false, false, "xgui_gmsettings" )
                 end
