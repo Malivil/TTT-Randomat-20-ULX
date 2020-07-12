@@ -224,6 +224,7 @@ slider[2].dcm = 1
 
 events["democracy"] = {}
 events["democracy"].name = "I love democracy, I love the republic"
+events["democracy"].altname = "Democracy"
 
 events["democracy"].sdr = {}
 slider = events["democracy"].sdr
