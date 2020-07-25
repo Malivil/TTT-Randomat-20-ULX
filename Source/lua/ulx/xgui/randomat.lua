@@ -484,11 +484,6 @@ if not ToT then
 	check[1].dsc = "Subscribe to the randomat Town of Terror addon to enable this event!"
 end
 
---[pocket]--------------------------------------------------
-
-events["pocket"] = {}
-events["pocket"].name = "What did I find in my pocket?"
-
 --[privacy]--------------------------------------------------
 
 events["privacy"] = {}
