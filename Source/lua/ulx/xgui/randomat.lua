@@ -692,24 +692,6 @@ slider[2].dsc = "Vote Timer (def. 10)"
 slider[2].min = 5
 slider[2].max = 30
 
---[gravity]--------------------------------------------------
-
-events["gravity"] = {}
-events["gravity"].name = "I don't think you realise the gravity of the situation."
-
-events["gravity"].sdr = {}
-slider = events["gravity"].sdr
-slider[1] = {}
-slider[1].cmd = "timer"
-slider[1].dsc = "Timer (def. 30)"
-slider[1].min = 5
-slider[1].max = 90
-slider[2] = {}
-slider[2].cmd = "duration"
-slider[2].dsc = "Duration (def. 3)"
-slider[2].min = 1
-slider[2].max = 15
-
 --[president]--------------------------------------------------
 
 events["president"] = {}
