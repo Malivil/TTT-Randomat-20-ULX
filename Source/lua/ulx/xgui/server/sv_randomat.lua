@@ -193,8 +193,6 @@ net.Receive("rdmtclear", function()
     RunConsoleCommand("ttt_randomat_clearevents")
     for _, v in pairs(player.GetAll()) do
         v:PrintMessage(HUD_PRINTTALK, "Cleared all active randomat events")
-        v:SetMaxHealth(100)
-        v:SetHealth(100)
     end
 end)
 
