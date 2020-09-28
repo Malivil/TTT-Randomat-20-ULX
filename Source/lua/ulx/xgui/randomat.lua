@@ -220,32 +220,6 @@ slider[2].min = 1
 slider[2].max = 100
 slider[2].dcm = 1
 
---[democracy]--------------------------------------------------
-
-events["democracy"] = {}
-events["democracy"].name = "I love democracy, I love the republic"
-events["democracy"].altname = "Democracy"
-
-events["democracy"].sdr = {}
-slider = events["democracy"].sdr
-slider[1] = {}
-slider[1].cmd = "timer"
-slider[1].dsc = "Timer (def. 40)"
-slider[1].min = 10
-slider[1].max = 90
-
-slider[2] = {}
-slider[2].cmd = "totalpct"
-slider[2].dsc = "% of players needed to vote for pass (def. 50)"
-slider[2].min = 0
-slider[2].max = 100
-
-events["democracy"].chk = {}
-check = events["democracy"].chk
-check[1] = {}
-check[1].cmd = "tiekills"
-check[1].dsc = "If 0, ties won't kill (def. 1)"
-
 --[explode]--------------------------------------------------
 
 events["explode"] = {}
@@ -816,7 +790,7 @@ net.Receive("randomatULXEventsTransfer", function()
 end)
 
 -----------General-Settings----------------------
-pnl = xlib.makelistlayout{ w=415, h=318, parent=xgui.null }
+local pnl = xlib.makelistlayout{ w=415, h=318, parent=xgui.null }
 
 local lst = vgui.Create( "DPanelList", pnl )
 lst:SetPos( 5, 25 )

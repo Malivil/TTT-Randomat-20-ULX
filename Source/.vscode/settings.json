@@ -1,0 +1,23 @@
+{
+    "Lua.diagnostics.globals": [
+        "xlib",
+        "xgui",
+        "LocalPlayer",
+        "SERVER",
+        "resource",
+        "GetConVarString",
+        "ConVarExists",
+        "ULib",
+        "GetConVarNumber",
+        "util",
+        "hook",
+        "Randomat",
+        "timer",
+        "net",
+        "RunConsoleCommand",
+        "player",
+        "HUD_PRINTTALK",
+        "GetConVar",
+        "vgui"
+    ]
+}
