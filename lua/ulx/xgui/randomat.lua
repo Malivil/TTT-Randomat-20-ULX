@@ -549,17 +549,6 @@ events["shutup"].name = "SHUT UP!"
 events["sosig"] = {}
 events["sosig"].name = "Sosig."
 
---[soulmates]--------------------------------------------------
-
-events["soulmates"] = {}
-events["soulmates"].name = "Soulmates"
-
-events["soulmates"].chk = {}
-check = events["soulmates"].chk
-check[1] = {}
-check[1].cmd = "affectall"
-check[1].dsc = "Give everyone a soulmate"
-
 --[suddendeath]--------------------------------------------------
 
 events["suddendeath"] = {}
