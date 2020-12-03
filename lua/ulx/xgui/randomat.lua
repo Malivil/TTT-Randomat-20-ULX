@@ -681,11 +681,6 @@ slider[1].dsc = "Timer (def. 15)"
 slider[1].min = 5
 slider[1].max = 60
 
---[ragdoll]--------------------------------------------------
-
-events["ragdoll"] = {}
-events["ragdoll"].name = "Bad Trip"
-
 --[inventory]--------------------------------------------------
 
 events["inventory"] = {}

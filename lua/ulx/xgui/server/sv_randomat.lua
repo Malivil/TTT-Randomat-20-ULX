@@ -93,7 +93,6 @@ local function init()
         table.insert(commands, "randomat_inventory_timer")
         table.insert(commands, "randomat_texplode_radius")
         table.insert(commands, "randomat_barrels_timer")
-        table.insert(commands, "ttt_randomat_ragdoll")
         table.insert(commands, "randomat_freeze_hint")
 
         --ToT-Commands--
