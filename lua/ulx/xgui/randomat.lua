@@ -2,22 +2,22 @@ local randomat_settings = xlib.makepanel{ parent=xgui.null }
 
 randomat_settings.panel = xlib.makepanel{ x=165, y=25, w=415, h=318, parent=randomat_settings }
 randomat_settings.catList = xlib.makelistview{ x=5, y=25, w=155, h=318, parent=randomat_settings }
-randomat_settings.catList:AddColumn( "Configs" )
+randomat_settings.catList:AddColumn("Configs")
 randomat_settings.catList.Columns[1].DoClick = function() end
 
-randomat_settings.catList.OnRowSelected = function( self, LineID, Line )
+randomat_settings.catList.OnRowSelected = function(self, LineID, Line)
 	local nPanel = xgui.modules.submodule[Line:GetValue(2)].panel
 	if nPanel ~= randomat_settings.curPanel then
-		nPanel:SetZPos( 0 )
-		xlib.addToAnimQueue( "pnlSlide", { panel=nPanel, startx=-435, starty=0, endx=0, endy=0, setvisible=true } )
+		nPanel:SetZPos(0)
+		xlib.addToAnimQueue("pnlSlide", { panel=nPanel, startx=-435, starty=0, endx=0, endy=0, setvisible=true })
 		if randomat_settings.curPanel then
-			randomat_settings.curPanel:SetZPos( -1 )
-			xlib.addToAnimQueue( randomat_settings.curPanel.SetVisible, randomat_settings.curPanel, false )
+			randomat_settings.curPanel:SetZPos(-1)
+			xlib.addToAnimQueue(randomat_settings.curPanel.SetVisible, randomat_settings.curPanel, false)
 		end
 		xlib.animQueue_start()
 		randomat_settings.curPanel = nPanel
 	else
-		xlib.addToAnimQueue( "pnlSlide", { panel=nPanel, startx=0, starty=0, endx=-435, endy=0, setvisible=false } )
+		xlib.addToAnimQueue("pnlSlide", { panel=nPanel, startx=0, starty=0, endx=-435, endy=0, setvisible=false })
 		self:ClearSelection()
 		randomat_settings.curPanel = nil
 		xlib.animQueue_start()
@@ -28,32 +28,32 @@ end
 --Process modular settings
 function randomat_settings.processModules()
 	randomat_settings.catList:Clear()
-	for i, module in ipairs( xgui.modules.submodule ) do
-		if module.mtype == "randomat_settings" and ( not module.access or LocalPlayer():query( module.access ) ) then
+	for i, module in ipairs(xgui.modules.submodule) do
+		if module.mtype == "randomat_settings" and (not module.access or LocalPlayer():query(module.access)) then
 			local w,h = module.panel:GetSize()
-			if w == h and h == 0 then module.panel:SetSize( 275, 322 ) end
+			if w == h and h == 0 then module.panel:SetSize(275, 322) end
 
 			if module.panel.scroll then --For DListLayouts
 				module.panel.scroll.panel = module.panel
 				module.panel = module.panel.scroll
 			end
-			module.panel:SetParent( randomat_settings.panel )
+			module.panel:SetParent(randomat_settings.panel)
 
-			local line = randomat_settings.catList:AddLine( module.name, i )
-			if ( module.panel == randomat_settings.curPanel ) then
+			local line = randomat_settings.catList:AddLine(module.name, i)
+			if (module.panel == randomat_settings.curPanel) then
 				randomat_settings.curPanel = nil
-				randomat_settings.catList:SelectItem( line )
+				randomat_settings.catList:SelectItem(line)
 			else
-				module.panel:SetVisible( false )
+				module.panel:SetVisible(false)
 			end
 		end
 	end
-	randomat_settings.catList:SortByColumn( 1, false )
+	randomat_settings.catList:SortByColumn(1, false)
 end
 randomat_settings.processModules()
 
-xgui.hookEvent( "onProcessModules", nil, randomat_settings.processModules )
-xgui.addModule( "Randomat", randomat_settings, "icon16/rdmt.png", "xgui_gmsettings" )
+xgui.hookEvent("onProcessModules", nil, randomat_settings.processModules)
+xgui.addModule("Randomat", randomat_settings, "icon16/rdmt.png", "xgui_gmsettings")
 
 local events = {}
 
@@ -713,13 +713,13 @@ local function loadRandomatULXEvents(eventsULX)
     for k, v in pairs(eventsULX) do
         local pnl = xlib.makelistlayout{ w=415, h=318, parent=xgui.null }
 
-        local lst = vgui.Create( "DPanelList", pnl )
-        lst:SetPos( 5, 25 )
-        lst:SetSize( 390, 275 )
-        lst:SetSpacing( 5 )
+        local lst = vgui.Create("DPanelList", pnl)
+        lst:SetPos(5, 25)
+        lst:SetSize(390, 275)
+        lst:SetSpacing(5)
 
         local enable = xlib.makecheckbox{label="Enabled", repconvar="rep_ttt_randomat_"..k, parent=lst}
-        lst:AddItem( enable )
+        lst:AddItem(enable)
 
         local elements = 1
         if v.sdr ~= nil then
@@ -753,13 +753,13 @@ local function loadRandomatULXEvents(eventsULX)
             RunConsoleCommand("ttt_randomat_trigger", k)
         end
 
-        xgui.hookEvent( "onProcessModules", nil, pnl.processModules )
+        xgui.hookEvent("onProcessModules", nil, pnl.processModules)
 
         if v.name ~= "" and v.name ~= nil then
-            xgui.addSubModule( v.name, pnl, nil, "randomat_settings" )
+            xgui.addSubModule(v.name, pnl, nil, "randomat_settings")
         end
         if v.altname ~= "" and v.altname ~= nil then
-            xgui.addSubModule( v.altname, pnl, nil, "randomat_settings" )
+            xgui.addSubModule(v.altname, pnl, nil, "randomat_settings")
         end
     end
 end
@@ -774,49 +774,60 @@ net.Receive("randomatULXEventsTransfer", function()
 end)
 
 -----------General-Settings----------------------
-local pnl = xlib.makelistlayout{ w=415, h=318, parent=xgui.null }
+local pnl = xlib.makelistlayout{ w=415, h=325, parent=xgui.null }
 
-local lst = vgui.Create( "DPanelList", pnl )
-lst:SetPos( 5, 25 )
-lst:SetSize( 390, 275 )
-lst:SetSpacing( 5 )
+local lst = vgui.Create("DPanelList", pnl)
+lst:SetPos(5, 25)
+lst:SetSize(390, 325)
+lst:SetSpacing(5)
 
 local rdmtauto = xlib.makecheckbox{label="Auto randomat on round start", repconvar="rep_ttt_randomat_auto", parent=lst}
-lst:AddItem( rdmtauto )
+lst:AddItem(rdmtauto)
 
-local rdmtautochance = xlib.makeslider{label="Auto randomat chance", repconvar="rep_randomat_auto_chance", min=0,max=1,decimal=2, parent=lst}
-lst:AddItem( rdmtautochance )
+local rdmtautochance = xlib.makeslider{label="Auto randomat chance", repconvar="rep_ttt_randomat_auto_chance", min=0,max=1,decimal=2, parent=lst}
+lst:AddItem(rdmtautochance)
 
 local rdmtrebuy = xlib.makecheckbox{label="Rebuyable randomat (Requires restart)", repconvar="rep_ttt_randomat_rebuyable", parent=lst}
-lst:AddItem( rdmtrebuy )
+lst:AddItem(rdmtrebuy)
 
 local rdmtchoice = xlib.makecheckbox{label="Choose events (settings in event configs)", repconvar="rep_ttt_randomat_chooseevent", parent=lst}
-lst:AddItem( rdmtchoice )
+lst:AddItem(rdmtchoice)
 
-xlib.makebutton{y = 95, w=150, label="Enable all events", parent=lst }.DoClick=function()
+local rdmthint = xlib.makecheckbox{label="Give event hints", repconvar="rep_ttt_randomat_event_hint", parent=lst}
+lst:AddItem(rdmthint)
+
+local rdmthintchat = xlib.makecheckbox{label="Give event hints in chat", repconvar="rep_ttt_randomat_event_hint_chat", parent=lst}
+lst:AddItem(rdmthintchat)
+
+local y = 135
+xlib.makebutton{y = y, w=150, label="Enable all events", parent=lst }.DoClick=function()
 	net.Start("rdmtenableall")
 	net.SendToServer()
 end
+y = y + 25
 
-xlib.makebutton{y = 120, w=150, label="Disable all events", parent=lst }.DoClick=function()
+xlib.makebutton{y = y, w=150, label="Disable all events", parent=lst }.DoClick=function()
 	net.Start("rdmtdisableall")
 	net.SendToServer()
 end
+y = y + 25
 
-xlib.makebutton{y = 145, w=150, label="Clear all active events", parent=lst }.DoClick=function()
+xlib.makebutton{y = y, w=150, label="Clear all active events", parent=lst }.DoClick=function()
 	net.Start("rdmtclear")
 	net.SendToServer()
 end
+y = y + 25
 
-xlib.makebutton{y = 170, w=150, label="Reset configs to default", parent=lst }.DoClick=function()
+xlib.makebutton{y = y, w=150, label="Reset configs to default", parent=lst }.DoClick=function()
 	net.Start("rdmtreset")
 	net.SendToServer()
 end
+y = y + 25
 
-xlib.makebutton{y = 195, w=150, label="Trigger random event", parent=lst }.DoClick=function()
+xlib.makebutton{y = y, w=150, label="Trigger random event", parent=lst }.DoClick=function()
 	net.Start("rdmtrandom")
 	net.SendToServer()
 end
 
-xgui.hookEvent( "onProcessModules", nil, pnl.processModules )
-xgui.addSubModule( "-Randomat Configs", pnl, nil, "randomat_settings" )
+xgui.hookEvent("onProcessModules", nil, pnl.processModules)
+xgui.addSubModule("-Randomat Configs", pnl, nil, "randomat_settings")
