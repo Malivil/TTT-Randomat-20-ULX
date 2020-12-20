@@ -18,6 +18,12 @@
         "player",
         "HUD_PRINTTALK",
         "GetConVar",
-        "vgui"
+        "vgui",
+        "surface",
+        "Color",
+        "TOP"
+    ],
+    "Lua.diagnostics.disable": [
+        "undefined-field"
     ]
 }
