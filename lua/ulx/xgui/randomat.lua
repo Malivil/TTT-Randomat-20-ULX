@@ -100,6 +100,9 @@ local function loadRandomatULXEvents(eventsULX)
         local enable = xlib.makecheckbox{label="Enabled", repconvar="rep_ttt_randomat_"..k, parent=lst}
         AddToList(enable, lst)
 
+        local min_players = xlib.makeslider{label="Minimum required players", repconvar="rep_ttt_randomat_"..k.."_min_players", min=0, max=32, 0, parent=lst}
+        AddToList(min_players, lst)
+
         if v.sdr ~= nil then
             for _, j in pairs(v.sdr) do
                 local conslider = xlib.makeslider{label=j.dsc, repconvar="rep_randomat_"..k.."_"..j.cmd, min=j.min, max=j.max, decimal=j.dcm or 0, parent=lst}
@@ -177,40 +180,40 @@ AddToList(rdmthint, lst)
 local rdmthintchat = xlib.makecheckbox{label="Give event hints in chat", repconvar="rep_ttt_randomat_event_hint_chat", parent=lst}
 AddToList(rdmthintchat, lst)
 
-local button = xlib.makebutton{w=150, label="Enable all events", parent=lst }
-button.DoClick=function()
+local enableButton = xlib.makebutton{w=150, label="Enable all events", parent=lst }
+enableButton.DoClick=function()
 	net.Start("rdmtenableall")
 	net.SendToServer()
 end
-AddToList(button, lst)
+AddToList(enableButton, lst)
 
-button = xlib.makebutton{ w=150, label="Disable all events", parent=lst }
-button.DoClick=function()
+local disableButton = xlib.makebutton{ w=150, label="Disable all events", parent=lst }
+disableButton.DoClick=function()
 	net.Start("rdmtdisableall")
 	net.SendToServer()
 end
-AddToList(button, lst)
+AddToList(disableButton, lst)
 
-button = xlib.makebutton{w=150, label="Clear all active events", parent=lst }
-button.DoClick=function()
+local clearButton = xlib.makebutton{w=150, label="Clear all active events", parent=lst }
+clearButton.DoClick=function()
 	net.Start("rdmtclear")
 	net.SendToServer()
 end
-AddToList(button, lst)
+AddToList(clearButton, lst)
 
-button = xlib.makebutton{w=150, label="Reset configs to default", parent=lst }
-button.DoClick=function()
+local resetButton = xlib.makebutton{w=150, label="Reset configs to default", parent=lst }
+resetButton.DoClick=function()
 	net.Start("rdmtreset")
 	net.SendToServer()
 end
-AddToList(button, lst)
+AddToList(resetButton, lst)
 
-button = xlib.makebutton{w=150, label="Trigger random event", parent=lst }
-button.DoClick=function()
+local randomButton = xlib.makebutton{w=150, label="Trigger random event", parent=lst }
+randomButton.DoClick=function()
 	net.Start("rdmtrandom")
 	net.SendToServer()
 end
-AddToList(button, lst)
+AddToList(randomButton, lst)
 
 xgui.hookEvent("onProcessModules", nil, pnl.processModules)
 xgui.addSubModule("- Randomat Configs -", pnl, nil, "randomat_settings")

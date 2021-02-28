@@ -14,7 +14,7 @@ local function init()
 
     for _, v in pairs(commands) do
         if ConVarExists(v) then
-            ULib.replicatedWritableCvar( v, "rep_"..v, GetConVarNumber( v ), false, false, "xgui_gmsettings" )
+            ULib.replicatedWritableCvar(v, "rep_"..v, GetConVarNumber(v), false, false, "xgui_gmsettings")
         end
     end
 end
@@ -40,30 +40,36 @@ hook.Add("Initialize", "InitRandomatULXEventTransfer", function()
 
             if ConVarExists(convar) then
                 table.insert(commands, convar)
-                ULib.replicatedWritableCvar( convar, "rep_"..convar, GetConVarNumber( convar ), false, false, "xgui_gmsettings" )
+                ULib.replicatedWritableCvar(convar, "rep_" .. convar, GetConVarNumber(convar), false, false, "xgui_gmsettings")
+            end
+
+            local min_players = convar .. "_min_players"
+            if ConVarExists(min_players) then
+                table.insert(commands, min_players)
+                ULib.replicatedWritableCvar(min_players, "rep_" .. min_players, GetConVarNumber(min_players), false, false, "xgui_gmsettings")
             end
 
             local numeric = table.Add(table.Add({}, sliders or {}), checks or {})
             for _, cv in pairs(numeric) do
-                local cmd = "randomat_"..v.id.."_"..cv.cmd
+                local cmd = "randomat_" .. v.id .. "_" .. cv.cmd
                 if ConVarExists(cmd) then
                     table.insert(commands, cmd)
-                    ULib.replicatedWritableCvar( cmd, "rep_" .. cmd, GetConVarNumber( cmd ), false, false, "xgui_gmsettings" )
+                    ULib.replicatedWritableCvar(cmd, "rep_" .. cmd, GetConVarNumber(cmd), false, false, "xgui_gmsettings")
                 end
             end
 
             for _, cv in pairs(textboxes or {}) do
-                local cmd = "randomat_"..v.id.."_"..cv.cmd
+                local cmd = "randomat_" .. v.id .. "_" .. cv.cmd
                 if ConVarExists(cmd) then
                     table.insert(commands, cmd)
-                    ULib.replicatedWritableCvar( cmd, "rep_" .. cmd, GetConVarString( cmd ), false, false, "xgui_gmsettings" )
+                    ULib.replicatedWritableCvar(cmd, "rep_" .. cmd, GetConVarString(cmd), false, false, "xgui_gmsettings")
                 end
             end
         end
     end
 end)
 
-hook.Add("PlayerInitialSpawn", "sendCombinedULXEventsTable", function( ply )
+hook.Add("PlayerInitialSpawn", "sendCombinedULXEventsTable", function(ply)
     local neweventsJSON = util.TableToJSON(newevents)
     timer.Simple(1, function()
         print("[RANDOMAT IMPORT EVENT ULX] Transfering randomat addon tables to: " .. tostring(ply))
@@ -105,8 +111,8 @@ net.Receive("rdmtreset", function()
     end
 
     for _, v in pairs(player.GetAll()) do
-        v:PrintMessage(HUD_PRINTTALK, "Reset configs to deafult values")
+        v:PrintMessage(HUD_PRINTTALK, "Reset configs to default values")
     end
 end)
 
-xgui.addSVModule( "randomat", init )
+xgui.addSVModule("randomat", init)
