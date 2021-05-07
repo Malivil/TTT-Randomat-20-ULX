@@ -11,49 +11,49 @@ randomat_settings.catList:AddColumn("Configs")
 randomat_settings.catList.Columns[1].DoClick = function() end
 
 randomat_settings.catList.OnRowSelected = function(self, LineID, Line)
-	local nPanel = xgui.modules.submodule[Line:GetValue(2)].panel
-	if nPanel ~= randomat_settings.curPanel then
-		nPanel:SetZPos(0)
-		xlib.addToAnimQueue("pnlSlide", { panel=nPanel, startx=-435, starty=0, endx=0, endy=0, setvisible=true })
-		if randomat_settings.curPanel then
-			randomat_settings.curPanel:SetZPos(-1)
-			xlib.addToAnimQueue(randomat_settings.curPanel.SetVisible, randomat_settings.curPanel, false)
-		end
-		xlib.animQueue_start()
-		randomat_settings.curPanel = nPanel
-	else
-		xlib.addToAnimQueue("pnlSlide", { panel=nPanel, startx=0, starty=0, endx=-435, endy=0, setvisible=false })
-		self:ClearSelection()
-		randomat_settings.curPanel = nil
-		xlib.animQueue_start()
-	end
-	if nPanel.onOpen then nPanel.onOpen() end --If the panel has it, call a function when it's opened
+    local nPanel = xgui.modules.submodule[Line:GetValue(2)].panel
+
+    if randomat_settings.curPanel ~= nil then
+        randomat_settings.curPanel:SetZPos(-1)
+        xlib.addToAnimQueue("pnlSlide", { panel=randomat_settings.curPanel, startx=0, starty=0, endx=-435, endy=0, setvisible=false })
+    end
+
+    if nPanel ~= randomat_settings.curPanel then
+        nPanel:SetZPos(0)
+        xlib.addToAnimQueue("pnlSlide", { panel=nPanel, startx=-435, starty=0, endx=0, endy=0, setvisible=true })
+        randomat_settings.curPanel = nPanel
+    else
+        self:ClearSelection()
+        randomat_settings.curPanel = nil
+    end
+    xlib.animQueue_start()
+    if nPanel.onOpen then nPanel.onOpen() end --If the panel has it, call a function when it's opened
 end
 
 --Process modular settings
 function randomat_settings.processModules()
-	randomat_settings.catList:Clear()
-	for i, module in ipairs(xgui.modules.submodule) do
-		if module.mtype == "randomat_settings" and (not module.access or LocalPlayer():query(module.access)) then
-			local w,h = module.panel:GetSize()
-			if w == h and h == 0 then module.panel:SetSize(275, 322) end
+    randomat_settings.catList:Clear()
+    for i, module in ipairs(xgui.modules.submodule) do
+        if module.mtype == "randomat_settings" and (not module.access or LocalPlayer():query(module.access)) then
+            local w,h = module.panel:GetSize()
+            if w == h and h == 0 then module.panel:SetSize(275, 322) end
 
-			if module.panel.scroll then --For DListLayouts
-				module.panel.scroll.panel = module.panel
-				module.panel = module.panel.scroll
-			end
-			module.panel:SetParent(randomat_settings.panel)
+            if module.panel.scroll then --For DListLayouts
+                module.panel.scroll.panel = module.panel
+                module.panel = module.panel.scroll
+            end
+            module.panel:SetParent(randomat_settings.panel)
 
-			local line = randomat_settings.catList:AddLine(module.name, i)
-			if (module.panel == randomat_settings.curPanel) then
-				randomat_settings.curPanel = nil
-				randomat_settings.catList:SelectItem(line)
-			else
-				module.panel:SetVisible(false)
-			end
-		end
-	end
-	randomat_settings.catList:SortByColumn(1, false)
+            local line = randomat_settings.catList:AddLine(module.name, i)
+            if (module.panel == randomat_settings.curPanel) then
+                randomat_settings.curPanel = nil
+                randomat_settings.catList:SelectItem(line)
+            else
+                module.panel:SetVisible(false)
+            end
+        end
+    end
+    randomat_settings.catList:SortByColumn(1, false)
 end
 randomat_settings.processModules()
 
@@ -144,9 +144,9 @@ local function loadRandomatULXEvents(eventsULX)
 end
 
 net.Receive("randomatULXEventsTransfer", function()
-	local importEventsJSON = net.ReadString()
-	local importedEvents = util.JSONToTable(importEventsJSON)
-	loadRandomatULXEvents(importedEvents)
+    local importEventsJSON = net.ReadString()
+    local importedEvents = util.JSONToTable(importEventsJSON)
+    loadRandomatULXEvents(importedEvents)
     -- Reload the modules since by this time its usually loaded already
     xgui.processModules()
 end)
@@ -182,36 +182,36 @@ AddToList(rdmthintchat, lst)
 
 local enableButton = xlib.makebutton{w=150, label="Enable all events", parent=lst }
 enableButton.DoClick=function()
-	net.Start("rdmtenableall")
-	net.SendToServer()
+    net.Start("rdmtenableall")
+    net.SendToServer()
 end
 AddToList(enableButton, lst)
 
 local disableButton = xlib.makebutton{ w=150, label="Disable all events", parent=lst }
 disableButton.DoClick=function()
-	net.Start("rdmtdisableall")
-	net.SendToServer()
+    net.Start("rdmtdisableall")
+    net.SendToServer()
 end
 AddToList(disableButton, lst)
 
 local clearButton = xlib.makebutton{w=150, label="Clear all active events", parent=lst }
 clearButton.DoClick=function()
-	net.Start("rdmtclear")
-	net.SendToServer()
+    net.Start("rdmtclear")
+    net.SendToServer()
 end
 AddToList(clearButton, lst)
 
 local resetButton = xlib.makebutton{w=150, label="Reset configs to default", parent=lst }
 resetButton.DoClick=function()
-	net.Start("rdmtreset")
-	net.SendToServer()
+    net.Start("rdmtreset")
+    net.SendToServer()
 end
 AddToList(resetButton, lst)
 
 local randomButton = xlib.makebutton{w=150, label="Trigger random event", parent=lst }
 randomButton.DoClick=function()
-	net.Start("rdmtrandom")
-	net.SendToServer()
+    net.Start("rdmtrandom")
+    net.SendToServer()
 end
 AddToList(randomButton, lst)
 
