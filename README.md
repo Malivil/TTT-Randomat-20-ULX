@@ -6,7 +6,8 @@ CreateConVar("randomat_example_slider2", 200, {FCVAR_NOTIFY, FCVAR_ARCHIVE}, "La
 CreateConVar("randomat_example_checkbox", 60, {FCVAR_NOTIFY, FCVAR_ARCHIVE}, "Checkbox")
 CreateConVar("randomat_example_textbox", "value", {FCVAR_NOTIFY, FCVAR_ARCHIVE}, "Textbox")
 
-EVENT.Title = "An example implementation of GetConVars"
+EVENT.Title = "GetConVars Example"
+EVENT.Description = "An example implementation of GetConVars"
 EVENT.id = "example"
 
 function EVENT:GetConVars()
