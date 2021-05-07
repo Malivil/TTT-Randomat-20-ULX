@@ -3,11 +3,13 @@ surface.CreateFont("TitleLabel", {
     size = 16
 })
 
+local config_label = "- Randomat Configs -"
 local randomat_settings = xlib.makepanel{ parent=xgui.null }
 
 randomat_settings.panel = xlib.makepanel{ x=165, y=25, w=415, h=318, parent=randomat_settings }
+randomat_settings.search = xlib.maketextbox{ x=5, y=2, w=155, h=21, enableinput=true, parent=randomat_settings }
 randomat_settings.catList = xlib.makelistview{ x=5, y=25, w=155, h=318, parent=randomat_settings }
-randomat_settings.catList:AddColumn("Configs")
+randomat_settings.catList:AddColumn("Events")
 randomat_settings.catList.Columns[1].DoClick = function() end
 
 randomat_settings.catList.OnRowSelected = function(self, LineID, Line)
@@ -56,6 +58,21 @@ function randomat_settings.processModules()
     randomat_settings.catList:SortByColumn(1, false)
 end
 randomat_settings.processModules()
+
+randomat_settings.search:SetPlaceholderText("Search...")
+randomat_settings.search:SetUpdateOnType(true)
+randomat_settings.search.OnValueChange = function(box, value)
+    randomat_settings.catList:ClearSelection()
+    randomat_settings.curPanel = nil
+    randomat_settings.processModules()
+    local lines = randomat_settings.catList:GetLines()
+    for i, line in ipairs(lines) do
+        local text = line:GetColumnText(1)
+        if text ~= config_label and not string.find(text:lower(), value:lower()) then
+            randomat_settings.catList:RemoveLine(i)
+        end
+    end
+end
 
 xgui.hookEvent("onProcessModules", nil, randomat_settings.processModules)
 xgui.addModule("Randomat", randomat_settings, "icon16/rdmt.png", "xgui_gmsettings")
@@ -216,4 +233,4 @@ end
 AddToList(randomButton, lst)
 
 xgui.hookEvent("onProcessModules", nil, pnl.processModules)
-xgui.addSubModule("- Randomat Configs -", pnl, nil, "randomat_settings")
+xgui.addSubModule(config_label, pnl, nil, "randomat_settings")
