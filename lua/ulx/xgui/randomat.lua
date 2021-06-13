@@ -86,11 +86,12 @@ end
 
 local function loadRandomatULXEvents(eventsULX)
     for k, v in pairs(eventsULX) do
-        local pnl = xlib.makelistlayout{ w=415, h=330, parent=xgui.null }
+        local pnl = xlib.makelistlayout{ w=415, h=315, parent=xgui.null }
+        pnl.scroll:SetSize(414, 315)
 
         local lst = vgui.Create("DListLayout", pnl)
         lst:SetPos(5, 25)
-        lst:SetSize(390, 330)
+        lst:SetSize(415, 315)
         lst:DockPadding(0, 5, 0, 0)
 
         local name = ""
