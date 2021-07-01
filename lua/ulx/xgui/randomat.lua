@@ -121,6 +121,9 @@ local function loadRandomatULXEvents(eventsULX)
         local min_players = xlib.makeslider{label="Minimum required players", repconvar="rep_ttt_randomat_"..k.."_min_players", min=0, max=32, 0, parent=lst}
         AddToList(min_players, lst)
 
+        local weight = xlib.makeslider{label="Event selection weight", repconvar="rep_ttt_randomat_"..k.."_weight", min=1, max=50, 0, parent=lst}
+        AddToList(weight, lst)
+
         if v.sdr ~= nil then
             for _, j in pairs(v.sdr) do
                 local conslider = xlib.makeslider{label=j.dsc, repconvar="rep_randomat_"..k.."_"..j.cmd, min=j.min, max=j.max, decimal=j.dcm or 0, parent=lst}

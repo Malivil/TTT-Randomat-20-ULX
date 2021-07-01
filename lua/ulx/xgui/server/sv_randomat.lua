@@ -49,6 +49,12 @@ hook.Add("Initialize", "InitRandomatULXEventTransfer", function()
                 ULib.replicatedWritableCvar(min_players, "rep_" .. min_players, GetConVarNumber(min_players), false, false, "xgui_gmsettings")
             end
 
+            local weight = convar .. "_weight"
+            if ConVarExists(weight) then
+                table.insert(commands, weight)
+                ULib.replicatedWritableCvar(weight, "rep_" .. weight, GetConVarNumber(weight), false, false, "xgui_gmsettings")
+            end
+
             local numeric = table.Add(table.Add({}, sliders or {}), checks or {})
             for _, cv in pairs(numeric) do
                 local cmd = "randomat_" .. v.id .. "_" .. cv.cmd
