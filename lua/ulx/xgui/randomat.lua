@@ -121,7 +121,7 @@ local function loadRandomatULXEvents(eventsULX)
         local min_players = xlib.makeslider{label="Minimum required players", repconvar="rep_ttt_randomat_"..k.."_min_players", min=0, max=32, 0, parent=lst}
         AddToList(min_players, lst)
 
-        local weight = xlib.makeslider{label="Event selection weight", repconvar="rep_ttt_randomat_"..k.."_weight", min=1, max=50, 0, parent=lst}
+        local weight = xlib.makeslider{label="Event selection weight", repconvar="rep_ttt_randomat_"..k.."_weight", min=-1, max=50, 0, parent=lst}
         AddToList(weight, lst)
 
         if v.sdr ~= nil then
@@ -173,11 +173,12 @@ net.Receive("randomatULXEventsTransfer", function()
 end)
 
 -----------General-Settings----------------------
-local pnl = xlib.makelistlayout{ w=415, h=325, parent=xgui.null }
+local pnl = xlib.makelistlayout{ w=415, h=315, parent=xgui.null }
+pnl.scroll:SetSize(414, 315)
 
 local lst = vgui.Create("DListLayout", pnl)
 lst:SetPos(5, 25)
-lst:SetSize(390, 325)
+lst:SetSize(415, 315)
 lst:DockPadding(0, 5, 0, 0)
 
 local labeltxt = xlib.makelabel{label="Randomat Configs", parent=lst, font="TitleLabel"}
@@ -194,6 +195,9 @@ AddToList(rdmtrebuy, lst)
 
 local rdmtchoice = xlib.makecheckbox{label="Choose events (See settings in 'Choose' event config)", repconvar="rep_ttt_randomat_chooseevent", parent=lst}
 AddToList(rdmtchoice, lst)
+
+local rdmteventweight = xlib.makeslider{label="Default event selection weight", repconvar="rep_ttt_randomat_event_weight", min=1,max=50, parent=lst}
+AddToList(rdmteventweight, lst)
 
 local rdmthint = xlib.makecheckbox{label="Give event hints", repconvar="rep_ttt_randomat_event_hint", parent=lst}
 AddToList(rdmthint, lst)
@@ -235,6 +239,13 @@ randomButton.DoClick=function()
     net.SendToServer()
 end
 AddToList(randomButton, lst)
+
+local resetWeightsButton = xlib.makebutton{w=150, label="Reset event weights", parent=lst }
+resetWeightsButton.DoClick=function()
+    net.Start("rdmtresetweights")
+    net.SendToServer()
+end
+AddToList(resetWeightsButton, lst)
 
 xgui.hookEvent("onProcessModules", nil, pnl.processModules)
 xgui.addSubModule(config_label, pnl, nil, "randomat_settings")

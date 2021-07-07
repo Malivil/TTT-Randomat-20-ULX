@@ -9,6 +9,7 @@ local function init()
     table.insert(commands, "ttt_randomat_auto_chance")
     table.insert(commands, "ttt_randomat_chooseevent")
     table.insert(commands, "ttt_randomat_rebuyable")
+    table.insert(commands, "ttt_randomat_event_weight")
     table.insert(commands, "ttt_randomat_event_hint")
     table.insert(commands, "ttt_randomat_event_hint_chat")
 
@@ -90,6 +91,7 @@ util.AddNetworkString("rdmtenableall")
 util.AddNetworkString("rdmtclear")
 util.AddNetworkString("rdmtreset")
 util.AddNetworkString("rdmtrandom")
+util.AddNetworkString("rdmtresetweights")
 
 net.Receive("rdmtdisableall", function()
     RunConsoleCommand("ttt_randomat_disableall")
@@ -108,6 +110,10 @@ end)
 
 net.Receive("rdmtrandom", function()
     RunConsoleCommand("ttt_randomat_triggerrandom")
+end)
+
+net.Receive("rdmtresetweights", function()
+    RunConsoleCommand("ttt_randomat_resetweights")
 end)
 
 net.Receive("rdmtreset", function()
