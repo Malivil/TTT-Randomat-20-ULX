@@ -7,6 +7,8 @@ local commands = {}
 local function init()
     table.insert(commands, "ttt_randomat_auto")
     table.insert(commands, "ttt_randomat_auto_chance")
+    table.insert(commands, "ttt_randomat_auto_silent")
+    table.insert(commands, "ttt_randomat_auto_choose")
     table.insert(commands, "ttt_randomat_chooseevent")
     table.insert(commands, "ttt_randomat_rebuyable")
     table.insert(commands, "ttt_randomat_event_weight")

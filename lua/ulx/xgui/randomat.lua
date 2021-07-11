@@ -190,6 +190,12 @@ AddToList(rdmtauto, lst)
 local rdmtautochance = xlib.makeslider{label="Auto randomat chance", repconvar="rep_ttt_randomat_auto_chance", min=0,max=1,decimal=2, parent=lst}
 AddToList(rdmtautochance, lst)
 
+local rdmtautosilent = xlib.makecheckbox{label="Auto randomats are silent", repconvar="rep_ttt_randomat_auto_silent", parent=lst}
+AddToList(rdmtautosilent, lst)
+
+local rdmtautochoose = xlib.makecheckbox{label="Auto randomat is always \"choose\"", repconvar="rep_ttt_randomat_auto_choose", parent=lst}
+AddToList(rdmtautochoose, lst)
+
 local rdmtrebuy = xlib.makecheckbox{label="Rebuyable randomat (Requires restart)", repconvar="rep_ttt_randomat_rebuyable", parent=lst}
 AddToList(rdmtrebuy, lst)
 
