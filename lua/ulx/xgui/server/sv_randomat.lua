@@ -22,6 +22,25 @@ local function init()
     end
 end
 
+local function MinimizeConVarData(data)
+    return {
+        c = data.cmd,
+        d = data.dsc
+    }
+end
+
+local function MinimizeNumberConVarData(data)
+    local min = MinimizeConVarData(data)
+    min.e = data.dcm or 0
+    if data.min then
+        min.m = math.Truncate(data.min, min.e)
+    end
+    if data.max then
+        min.x = math.Truncate(data.max, min.e)
+    end
+    return min
+end
+
 local newevents = {}
 hook.Add("Initialize", "InitRandomatULXEventTransfer", function()
     for _, v in pairs(Randomat.Events) do
@@ -32,14 +51,39 @@ hook.Add("Initialize", "InitRandomatULXEventTransfer", function()
                 sliders, checks, textboxes = v:GetConVars()
             end
 
-            newevents[v.id] = {
-                name = v.Title,
-                altname = v.AltTitle,
-                dsc = v.Description,
-                sdr = sliders,
-                chk = checks,
-                txt = textboxes
-            }
+            local data = {}
+            -- Only save the properties that are being used
+            if v.Title and #v.Title > 0 then
+                data.n = v.Title
+            end
+            if v.AltTitle and #v.AltTitle > 0 then
+                data.an = v.AltTitle
+            end
+            if v.Description and #v.Description > 0 then
+                data.d = v.Description
+            end
+
+            -- Only bother sending the cvar lists that have entries
+            if sliders and #sliders > 0 then
+                data.s = {}
+                for _, s in ipairs(sliders) do
+                    table.insert(data.s, MinimizeNumberConVarData(s))
+                end
+            end
+            if checks and #checks > 0 then
+                data.c = {}
+                for _, c in ipairs(checks) do
+                    table.insert(data.c, MinimizeConVarData(c))
+                end
+            end
+            if textboxes and #textboxes > 0 then
+                data.t = {}
+                for _, t in ipairs(textboxes) do
+                    table.insert(data.t, MinimizeConVarData(t))
+                end
+            end
+
+            newevents[v.id] = data
 
             if ConVarExists(convar) then
                 table.insert(commands, convar)

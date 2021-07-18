@@ -95,14 +95,14 @@ local function loadRandomatULXEvents(eventsULX)
         lst:DockPadding(0, 5, 0, 0)
 
         local name = ""
-        if v.name ~= "" and v.name ~= nil then
-            name = name .. v.name
+        if v.n ~= "" and v.n ~= nil then
+            name = name .. v.n
         end
-        if v.altname ~= "" and v.altname ~= nil then
+        if v.an ~= "" and v.an ~= nil then
             if string.len(name) == 0 then
-                name = v.altname
+                name = v.an
             else
-                name = name .. " (aka " .. v.altname .. ")"
+                name = name .. " (aka " .. v.an .. ")"
             end
         end
         if name ~= "" then
@@ -110,8 +110,8 @@ local function loadRandomatULXEvents(eventsULX)
             lst:Add(labeltxt)
         end
 
-        if v.dsc ~= "" and v.dsc ~= nil then
-            local labeltxt = xlib.makelabel{label=v.dsc, parent=lst, tooltip=v.dsc}
+        if v.d ~= "" and v.d ~= nil then
+            local labeltxt = xlib.makelabel{label=v.d, parent=lst, tooltip=v.d}
             AddToList(labeltxt, lst)
         end
 
@@ -124,25 +124,25 @@ local function loadRandomatULXEvents(eventsULX)
         local weight = xlib.makeslider{label="Event selection weight", repconvar="rep_ttt_randomat_"..k.."_weight", min=-1, max=50, 0, parent=lst}
         AddToList(weight, lst)
 
-        if v.sdr ~= nil then
-            for _, j in pairs(v.sdr) do
-                local conslider = xlib.makeslider{label=j.dsc, repconvar="rep_randomat_"..k.."_"..j.cmd, min=j.min, max=j.max, decimal=j.dcm or 0, parent=lst}
+        if v.s ~= nil then
+            for _, j in pairs(v.s) do
+                local conslider = xlib.makeslider{label=j.d, repconvar="rep_randomat_"..k.."_"..j.c, min=j.m, max=j.x, decimal=j.e or 0, parent=lst}
                 AddToList(conslider, lst)
             end
         end
 
-        if v.chk ~= nil then
-            for _, j in pairs(v.chk) do
-                local concheck = xlib.makecheckbox{label=j.dsc, repconvar="rep_randomat_"..k.."_"..j.cmd, parent=lst}
+        if v.c ~= nil then
+            for _, j in pairs(v.c) do
+                local concheck = xlib.makecheckbox{label=j.d, repconvar="rep_randomat_"..k.."_"..j.c, parent=lst}
                 AddToList(concheck, lst)
             end
         end
 
-        if v.txt ~= nil then
-            for _, j in pairs(v.txt) do
-                local labeltxt = xlib.makelabel{label=j.dsc, parent=lst}
+        if v.t ~= nil then
+            for _, j in pairs(v.t) do
+                local labeltxt = xlib.makelabel{label=j.d, parent=lst}
                 AddToList(labeltxt, lst)
-                local contxt = xlib.maketextbox{repconvar="rep_randomat_"..k.."_"..j.cmd, enableinput=true, parent=lst}
+                local contxt = xlib.maketextbox{repconvar="rep_randomat_"..k.."_"..j.c, enableinput=true, parent=lst}
                 AddToList(contxt, lst)
             end
         end
@@ -155,18 +155,18 @@ local function loadRandomatULXEvents(eventsULX)
 
         xgui.hookEvent("onProcessModules", nil, pnl.processModules)
 
-        if v.name ~= "" and v.name ~= nil then
-            xgui.addSubModule(string.TrimLeft(v.name, "#"), pnl, nil, "randomat_settings")
+        if v.n ~= "" and v.n ~= nil then
+            xgui.addSubModule(string.TrimLeft(v.n, "#"), pnl, nil, "randomat_settings")
         end
-        if v.altname ~= "" and v.altname ~= nil then
-            xgui.addSubModule(string.TrimLeft(v.altname, "#"), pnl, nil, "randomat_settings")
+        if v.an ~= "" and v.an ~= nil then
+            xgui.addSubModule(string.TrimLeft(v.an, "#"), pnl, nil, "randomat_settings")
         end
     end
 end
 
 net.Receive("randomatULXEventsTransfer", function()
-    local importEventsJSON = net.ReadString()
-    local importedEvents = util.JSONToTable(importEventsJSON)
+    local importEventsJson = net.ReadString()
+    local importedEvents = util.JSONToTable(importEventsJson)
     loadRandomatULXEvents(importedEvents)
     -- Reload the modules since by this time its usually loaded already
     xgui.processModules()
