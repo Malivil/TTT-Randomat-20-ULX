@@ -33,10 +33,10 @@ local function MinimizeNumberConVarData(data)
     local min = MinimizeConVarData(data)
     min.e = data.dcm or 0
     if data.min then
-        min.m = math.Truncate(data.min, min.e)
+        min.m = math.Round(data.min, min.e)
     end
     if data.max then
-        min.x = math.Truncate(data.max, min.e)
+        min.x = math.Round(data.max, min.e)
     end
     return min
 end
