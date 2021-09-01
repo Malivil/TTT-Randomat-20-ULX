@@ -46,7 +46,7 @@ hook.Add("Initialize", "InitRandomatULXEventTransfer", function()
     for _, v in pairs(Randomat.Events) do
         local convar = "ttt_randomat_" .. v.id
         if not table.HasValue(commands, convar) then
-            local sliders, checks, textboxes;
+            local sliders, checks, textboxes
             if v.GetConVars then
                 sliders, checks, textboxes = v:GetConVars()
             end
