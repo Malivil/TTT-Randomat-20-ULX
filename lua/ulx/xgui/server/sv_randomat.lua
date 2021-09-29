@@ -1,5 +1,5 @@
 --Only execute the following code if it's a terrortown gamemode
-if GetConVarString("gamemode") ~= "terrortown" then return end
+if GetConVar("gamemode"):GetString() ~= "terrortown" then return end
 
 util.AddNetworkString("randomatULXEventsTransfer")
 
@@ -17,7 +17,7 @@ local function init()
 
     for _, v in pairs(commands) do
         if ConVarExists(v) then
-            ULib.replicatedWritableCvar(v, "rep_"..v, GetConVarNumber(v), false, false, "xgui_gmsettings")
+            ULib.replicatedWritableCvar(v, "rep_"..v, GetConVar(v):GetString(), false, false, "xgui_gmsettings")
         end
     end
 end
@@ -87,19 +87,19 @@ hook.Add("Initialize", "InitRandomatULXEventTransfer", function()
 
             if ConVarExists(convar) then
                 table.insert(commands, convar)
-                ULib.replicatedWritableCvar(convar, "rep_" .. convar, GetConVarNumber(convar), false, false, "xgui_gmsettings")
+                ULib.replicatedWritableCvar(convar, "rep_" .. convar, GetConVar(convar):GetString(), false, false, "xgui_gmsettings")
             end
 
             local min_players = convar .. "_min_players"
             if ConVarExists(min_players) then
                 table.insert(commands, min_players)
-                ULib.replicatedWritableCvar(min_players, "rep_" .. min_players, GetConVarNumber(min_players), false, false, "xgui_gmsettings")
+                ULib.replicatedWritableCvar(min_players, "rep_" .. min_players, GetConVar(min_players):GetString(), false, false, "xgui_gmsettings")
             end
 
             local weight = convar .. "_weight"
             if ConVarExists(weight) then
                 table.insert(commands, weight)
-                ULib.replicatedWritableCvar(weight, "rep_" .. weight, GetConVarNumber(weight), false, false, "xgui_gmsettings")
+                ULib.replicatedWritableCvar(weight, "rep_" .. weight, GetConVar(weight):GetString(), false, false, "xgui_gmsettings")
             end
 
             local numeric = table.Add(table.Add({}, sliders or {}), checks or {})
@@ -107,7 +107,7 @@ hook.Add("Initialize", "InitRandomatULXEventTransfer", function()
                 local cmd = "randomat_" .. v.id .. "_" .. cv.cmd
                 if ConVarExists(cmd) then
                     table.insert(commands, cmd)
-                    ULib.replicatedWritableCvar(cmd, "rep_" .. cmd, GetConVarNumber(cmd), false, false, "xgui_gmsettings")
+                    ULib.replicatedWritableCvar(cmd, "rep_" .. cmd, GetConVar(cmd):GetString(), false, false, "xgui_gmsettings")
                 end
             end
 
@@ -115,7 +115,7 @@ hook.Add("Initialize", "InitRandomatULXEventTransfer", function()
                 local cmd = "randomat_" .. v.id .. "_" .. cv.cmd
                 if ConVarExists(cmd) then
                     table.insert(commands, cmd)
-                    ULib.replicatedWritableCvar(cmd, "rep_" .. cmd, GetConVarString(cmd), false, false, "xgui_gmsettings")
+                    ULib.replicatedWritableCvar(cmd, "rep_" .. cmd, GetConVar(cmd):GetString(), false, false, "xgui_gmsettings")
                 end
             end
         end
