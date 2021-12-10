@@ -211,6 +211,9 @@ AddToList(rdmthint, lst)
 local rdmthintchat = xlib.makecheckbox{label="Give event hints in chat", repconvar="rep_ttt_randomat_event_hint_chat", parent=lst}
 AddToList(rdmthintchat, lst)
 
+local rdmthistory = xlib.makeslider{label="Historical event tracking count", repconvar="rep_ttt_randomat_event_history", min=0,max=100, parent=lst}
+AddToList(rdmthistory, lst)
+
 local enableButton = xlib.makebutton{w=150, label="Enable all events", parent=lst }
 enableButton.DoClick=function()
     net.Start("rdmtenableall")
@@ -252,6 +255,13 @@ resetWeightsButton.DoClick=function()
     net.SendToServer()
 end
 AddToList(resetWeightsButton, lst)
+
+local clearHistoryButton = xlib.makebutton{w=150, label="Clear event history", parent=lst }
+clearHistoryButton.DoClick=function()
+    net.Start("rdmtclearhistory")
+    net.SendToServer()
+end
+AddToList(clearHistoryButton, lst)
 
 xgui.hookEvent("onProcessModules", nil, pnl.processModules)
 xgui.addSubModule(config_label, pnl, nil, "randomat_settings")

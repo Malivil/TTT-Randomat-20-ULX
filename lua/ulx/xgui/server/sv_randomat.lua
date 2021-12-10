@@ -14,6 +14,7 @@ local function init()
     table.insert(commands, "ttt_randomat_event_weight")
     table.insert(commands, "ttt_randomat_event_hint")
     table.insert(commands, "ttt_randomat_event_hint_chat")
+    table.insert(commands, "ttt_randomat_event_history")
 
     for _, v in pairs(commands) do
         if ConVarExists(v) then
@@ -138,6 +139,7 @@ util.AddNetworkString("rdmtclear")
 util.AddNetworkString("rdmtreset")
 util.AddNetworkString("rdmtrandom")
 util.AddNetworkString("rdmtresetweights")
+util.AddNetworkString("rdmtclearhistory")
 
 net.Receive("rdmtdisableall", function()
     RunConsoleCommand("ttt_randomat_disableall")
@@ -160,6 +162,10 @@ end)
 
 net.Receive("rdmtresetweights", function()
     RunConsoleCommand("ttt_randomat_resetweights")
+end)
+
+net.Receive("rdmtclearhistory", function()
+    RunConsoleCommand("ttt_randomat_clearhistory")
 end)
 
 net.Receive("rdmtreset", function()
