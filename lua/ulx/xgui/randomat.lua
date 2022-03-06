@@ -115,6 +115,12 @@ local function loadRandomatULXEvents(eventsULX)
             AddToList(labeltxt, lst)
         end
 
+        if v.ct ~= nil and #v.ct > 0 then
+            local categories = string.Implode(", ", v.ct)
+            local labeltxt = xlib.makelabel{label="Categories: " .. categories, parent=lst, tooltip=categories}
+            AddToList(labeltxt, lst)
+        end
+
         local enable = xlib.makecheckbox{label="Enabled", repconvar="rep_ttt_randomat_"..k, parent=lst}
         AddToList(enable, lst)
 

@@ -63,6 +63,9 @@ hook.Add("Initialize", "InitRandomatULXEventTransfer", function()
             if v.Description and #v.Description > 0 then
                 data.d = v.Description
             end
+            if type(v.Categories) == "table" and #v.Categories > 0 then
+                data.ct = v.Categories
+            end
 
             -- Only bother sending the cvar lists that have entries
             if sliders and #sliders > 0 then
