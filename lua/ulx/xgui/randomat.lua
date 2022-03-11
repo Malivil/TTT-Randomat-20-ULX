@@ -193,6 +193,9 @@ lst:Add(labeltxt)
 local rdmtauto = xlib.makecheckbox{label="Auto randomat on round start", repconvar="rep_ttt_randomat_auto", parent=lst}
 AddToList(rdmtauto, lst)
 
+local rdmtautorounds = xlib.makeslider{label="Auto randomat min. rounds", repconvar="rep_ttt_randomat_auto_min_rounds", min=0,max=20, parent=lst}
+AddToList(rdmtautorounds, lst)
+
 local rdmtautochance = xlib.makeslider{label="Auto randomat chance", repconvar="rep_ttt_randomat_auto_chance", min=0,max=1,decimal=2, parent=lst}
 AddToList(rdmtautochance, lst)
 

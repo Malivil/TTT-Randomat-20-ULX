@@ -6,6 +6,7 @@ util.AddNetworkString("randomatULXEventsTransfer")
 local commands = {}
 local function init()
     table.insert(commands, "ttt_randomat_auto")
+    table.insert(commands, "ttt_randomat_auto_min_rounds")
     table.insert(commands, "ttt_randomat_auto_chance")
     table.insert(commands, "ttt_randomat_auto_silent")
     table.insert(commands, "ttt_randomat_auto_choose")
