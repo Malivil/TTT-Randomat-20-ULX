@@ -116,7 +116,7 @@ local function loadRandomatULXEvents(eventsULX)
         end
 
         if v.ct ~= nil and #v.ct > 0 then
-            local categories = string.Implode(", ", v.ct)
+            local categories = table.concat(v.ct, ", ")
             local labeltxt = xlib.makelabel{label="Categories: " .. categories, parent=lst, tooltip=categories}
             AddToList(labeltxt, lst)
         end
