@@ -61,7 +61,9 @@ hook.Add("Initialize", "InitRandomatULXEventTransfer", function()
             if v.AltTitle and #v.AltTitle > 0 then
                 data.an = v.AltTitle
             end
-            if v.Description and #v.Description > 0 then
+            if v.ExtDescription and #v.ExtDescription > 0 then
+                data.d = v.ExtDescription
+            elseif v.Description and #v.Description > 0 then
                 data.d = v.Description
             end
             if type(v.Categories) == "table" and #v.Categories > 0 then
@@ -129,10 +131,13 @@ end)
 
 hook.Add("PlayerInitialSpawn", "sendCombinedULXEventsTable", function(ply)
     local neweventsJSON = util.TableToJSON(newevents)
+    local compressedString = util.Compress(neweventsJSON)
+    local len = #compressedString
     timer.Simple(1, function()
         print("[RANDOMAT IMPORT EVENT ULX] Transfering randomat addon tables to: " .. tostring(ply))
         net.Start("randomatULXEventsTransfer")
-        net.WriteString(neweventsJSON)
+        net.WriteUInt(len, 16)
+        net.WriteData(compressedString, len)
         net.Send(ply)
     end)
 end)

@@ -171,7 +171,9 @@ local function loadRandomatULXEvents(eventsULX)
 end
 
 net.Receive("randomatULXEventsTransfer", function()
-    local importEventsJson = net.ReadString()
+    local len = net.ReadUInt(16)
+    local compressedString = net.ReadData(len)
+    local importEventsJson = util.Decompress(compressedString)
     local importedEvents = util.JSONToTable(importEventsJson)
     loadRandomatULXEvents(importedEvents)
     -- Reload the modules since by this time its usually loaded already
