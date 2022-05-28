@@ -68,7 +68,7 @@ randomat_settings.search.OnValueChange = function(box, value)
     local lines = randomat_settings.catList:GetLines()
     for i, line in ipairs(lines) do
         local text = line:GetColumnText(1)
-        if text ~= config_label and not string.find(text:lower(), value:lower()) then
+        if text ~= config_label and not string.find(text:lower(), value:lower(), 1, false) then
             randomat_settings.catList:RemoveLine(i)
         end
     end
