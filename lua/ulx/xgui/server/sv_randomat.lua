@@ -186,6 +186,37 @@ rdmt:defaultAccess(ULib.ACCESS_SUPERADMIN)
 rdmt:setOpposite("ulx srdmt", { _, _, true }, "!srdmt", true)
 rdmt:help("Starts a Randomat event with the given ID")
 
+function ulx.clearevent(calling_ply, target_event)
+    if GetConVar("gamemode"):GetString() ~= "terrortown" then
+        ULib.tsayError(calling_ply, WRONG_GAMEMODE, true)
+        return
+    end
+
+    Randomat:EndActiveEvent(target_event)
+    ulx.fancyLogAdmin(calling_ply, false, "#A stopped a Randomat event with an ID of #s.", target_event)
+end
+
+local clearevent = ulx.command(CATEGORY_NAME, "ulx clearevent", ulx.clearevent, "!clearevent")
+clearevent:addParam { type = ULib.cmds.StringArg, hint = "Event ID" }
+clearevent:defaultAccess(ULib.ACCESS_SUPERADMIN)
+clearevent:setOpposite("ulx stopevent", {}, "!stopevent", true)
+clearevent:help("Stops a Randomat event with the given ID")
+
+function ulx.clearevents(calling_ply)
+    if GetConVar("gamemode"):GetString() ~= "terrortown" then
+        ULib.tsayError(calling_ply, WRONG_GAMEMODE, true)
+        return
+    end
+
+    Randomat:EndActiveEvents()
+    ulx.fancyLogAdmin(calling_ply, false, "#A stopped all active Randomat events.")
+end
+
+local clearevents = ulx.command(CATEGORY_NAME, "ulx clearevents", ulx.clearevents, "!clearevents")
+clearevents:defaultAccess(ULib.ACCESS_SUPERADMIN)
+clearevents:setOpposite("ulx stopevents", {}, "!stopevents", true)
+clearevents:help("Stops all active Randomat events")
+
 -------------
 -- Buttons --
 -------------

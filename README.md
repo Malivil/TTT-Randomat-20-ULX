@@ -1,6 +1,8 @@
 # Chat Commands
-*!rdmt EventId* - Starts an event with the given "EventId"\
-*!srdmt EventId* - Safely starts an event with the given "EventId". Will error if the event's conditions are not met.
+*!rdmt EventId* - Starts an event with the given "EventId".\
+*!srdmt EventId* - Safely starts an event with the given "EventId". Will cause a server-side error if the event's conditions are not met.\
+*!clearevent EventId*/*!stopevent EventId* - Stops an event with the given "EventId". Will cause a server-side error if no event with that ID is running.\
+*!clearevents*/*!stopevents* - Stops all active events.
 
 # GetConVars Implementation Example
 
