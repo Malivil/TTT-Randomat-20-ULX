@@ -1,3 +1,7 @@
+# Chat Commands
+*!rdmt EventId* - Starts an event with the given "EventId"\
+*!srdmt EventId* - Safely starts an event with the given "EventId". Will error if the event's conditions are not met.
+
 # GetConVars Implementation Example
 
 ``` lua

@@ -142,6 +142,54 @@ hook.Add("PlayerInitialSpawn", "sendCombinedULXEventsTable", function(ply)
     end)
 end)
 
+-------------------
+-- Chat commands --
+-------------------
+
+local WRONG_GAMEMODE = "The current gamemode is not trouble in terrorist town!"
+local CATEGORY_NAME = "Randomat"
+
+ulx.rdmt_events = {}
+local function updateEventIds()
+    if GAMEMODE.FolderName ~= "terrortown" then return end
+
+    table.Empty(ulx.rdmt_events) -- Don't reassign so we don't lose our refs
+
+    for _, e in pairs(Randomat.Events) do
+        table.insert(ulx.rdmt_events, e.Id or e.id)
+    end
+    table.sort(ulx.rdmt_events, function(a, b) return a < b end)
+end
+hook.Add(ULib.HOOK_UCLCHANGED, "ULXRandomatEventIdsUpdate", updateEventIds)
+hook.Add("TTTPrepareRound", "ULXRandomatEventIdsUpdate_PrepareRound", updateEventIds)
+
+function ulx.rdmt(calling_ply, target_event, safe)
+    if GetConVar("gamemode"):GetString() ~= "terrortown" then
+        ULib.tsayError(calling_ply, WRONG_GAMEMODE, true)
+        return
+    end
+
+    local method = ""
+    if safe then
+        method = "safely "
+        Randomat:SafeTriggerEvent(target_event, calling_ply, true)
+    else
+        Randomat:TriggerEvent(target_event, calling_ply)
+    end
+    ulx.fancyLogAdmin(calling_ply, false, "#A " .. method .. "started a Randomat event with an ID of #s.", target_event)
+end
+
+local rdmt = ulx.command(CATEGORY_NAME, "ulx rdmt", ulx.rdmt, "!rdmt")
+rdmt:addParam { type = ULib.cmds.StringArg, completes = ulx.rdmt_events, hint = "Event ID", error = "Invalid Event ID \"%s\" specified", ULib.cmds.restrictToCompletes }
+rdmt:addParam { type = ULib.cmds.BoolArg, invisible = true }
+rdmt:defaultAccess(ULib.ACCESS_SUPERADMIN)
+rdmt:setOpposite("ulx srdmt", { _, _, true }, "!srdmt", true)
+rdmt:help("Starts a Randomat event with the given ID")
+
+-------------
+-- Buttons --
+-------------
+
 util.AddNetworkString("rdmtdisableall")
 util.AddNetworkString("rdmtenableall")
 util.AddNetworkString("rdmtclear")
