@@ -225,6 +225,9 @@ AddToList(rdmthintchat, lst)
 local rdmthistory = xlib.makeslider{label="Historical event tracking count", repconvar="rep_ttt_randomat_event_history", min=0,max=100, parent=lst}
 AddToList(rdmthistory, lst)
 
+local rdmtclientlist = xlib.makecheckbox{label="Allow clients to see active event list", repconvar="rep_ttt_randomat_allow_client_list", parent=lst}
+AddToList(rdmtclientlist, lst)
+
 local enableButton = xlib.makebutton{w=150, label="Enable all events", parent=lst }
 enableButton.DoClick=function()
     net.Start("rdmtenableall")

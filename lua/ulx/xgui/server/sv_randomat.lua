@@ -16,6 +16,7 @@ local function init()
     table.insert(commands, "ttt_randomat_event_hint")
     table.insert(commands, "ttt_randomat_event_hint_chat")
     table.insert(commands, "ttt_randomat_event_history")
+    table.insert(commands, "ttt_randomat_allow_client_list")
 
     for _, v in pairs(commands) do
         if ConVarExists(v) then
