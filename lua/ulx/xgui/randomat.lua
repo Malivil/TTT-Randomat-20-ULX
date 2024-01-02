@@ -84,8 +84,10 @@ local function AddToList(element, list)
     list:Add(element)
 end
 
-local function loadRandomatULXEvents(eventsULX)
+local function LoadRandomatULXEvents(eventsULX)
+    local eventids = {""}
     for k, v in pairs(eventsULX) do
+        table.insert(eventids, k)
         local pnl = xlib.makelistlayout{ w=415, h=315, parent=xgui.null }
         pnl.scroll:SetSize(414, 315)
 
@@ -168,6 +170,117 @@ local function loadRandomatULXEvents(eventsULX)
             xgui.addSubModule(string.TrimLeft(v.an, "#"), pnl, nil, "randomat_settings")
         end
     end
+
+    return eventids
+end
+
+local function SetupGeneralSettings(eventids)
+    -----------General-Settings----------------------
+    local pnl = xlib.makelistlayout{ w=415, h=315, parent=xgui.null }
+    pnl.scroll:SetSize(414, 315)
+
+    local lst = vgui.Create("DListLayout", pnl)
+    lst:SetPos(5, 25)
+    lst:SetSize(415, 315)
+    lst:DockPadding(0, 5, 0, 0)
+
+    local labeltxt = xlib.makelabel{label="Randomat Configs", parent=lst, font="TitleLabel"}
+    lst:Add(labeltxt)
+
+    local rdmtauto = xlib.makecheckbox{label="Auto randomat on round start", repconvar="rep_ttt_randomat_auto", parent=lst}
+    AddToList(rdmtauto, lst)
+
+    local rdmtautorounds = xlib.makeslider{label="Auto randomat min. rounds", repconvar="rep_ttt_randomat_auto_min_rounds", min=0,max=20, parent=lst}
+    AddToList(rdmtautorounds, lst)
+
+    local rdmtautochance = xlib.makeslider{label="Auto randomat chance", repconvar="rep_ttt_randomat_auto_chance", min=0,max=1,decimal=2, parent=lst}
+    AddToList(rdmtautochance, lst)
+
+    local rdmtautosilent = xlib.makecheckbox{label="Auto randomats are silent", repconvar="rep_ttt_randomat_auto_silent", parent=lst}
+    AddToList(rdmtautosilent, lst)
+
+    local rdmtautochoose = xlib.makecheckbox{label="Auto randomat is always \"choose\"", repconvar="rep_ttt_randomat_auto_choose", parent=lst}
+    AddToList(rdmtautochoose, lst)
+
+    local rdmtrebuy = xlib.makecheckbox{label="Rebuyable randomat (Requires restart)", repconvar="rep_ttt_randomat_rebuyable", parent=lst}
+    AddToList(rdmtrebuy, lst)
+
+    local rdmtchoice = xlib.makecheckbox{label="Choose events (See settings in 'Choose' event config)", repconvar="rep_ttt_randomat_chooseevent", parent=lst}
+    AddToList(rdmtchoice, lst)
+
+    local rdmteventweight = xlib.makeslider{label="Default event selection weight", repconvar="rep_ttt_randomat_event_weight", min=1,max=50, parent=lst}
+    AddToList(rdmteventweight, lst)
+
+    local rdmthint = xlib.makecheckbox{label="Give event hints", repconvar="rep_ttt_randomat_event_hint", parent=lst}
+    AddToList(rdmthint, lst)
+
+    local rdmthintchat = xlib.makecheckbox{label="Give event hints in chat", repconvar="rep_ttt_randomat_event_hint_chat", parent=lst}
+    AddToList(rdmthintchat, lst)
+
+    local rdmthistory = xlib.makeslider{label="Historical event tracking count", repconvar="rep_ttt_randomat_event_history", min=0,max=100, parent=lst}
+    AddToList(rdmthistory, lst)
+
+    local rdmtclientlist = xlib.makecheckbox{label="Allow clients to see active event list", repconvar="rep_ttt_randomat_allow_client_list", parent=lst}
+    AddToList(rdmtclientlist, lst)
+
+    local rdmtalwaystriggerlbl = xlib.makelabel{label="Trigger this event silently every round", parent=lst}
+    AddToList(rdmtalwaystriggerlbl, lst)
+
+    table.sort(eventids)
+    local rdmtalwaystrigger = xlib.makecombobox{repconvar="rep_ttt_randomat_always_silently_trigger", isNumberConvar=false, choices=eventids, parent=lst}
+    AddToList(rdmtalwaystrigger, lst)
+
+    local enableButton = xlib.makebutton{w=150, label="Enable all events", parent=lst }
+    enableButton.DoClick=function()
+        net.Start("rdmtenableall")
+        net.SendToServer()
+    end
+    AddToList(enableButton, lst)
+
+    local disableButton = xlib.makebutton{ w=150, label="Disable all events", parent=lst }
+    disableButton.DoClick=function()
+        net.Start("rdmtdisableall")
+        net.SendToServer()
+    end
+    AddToList(disableButton, lst)
+
+    local clearButton = xlib.makebutton{w=150, label="Clear all active events", parent=lst }
+    clearButton.DoClick=function()
+        net.Start("rdmtclear")
+        net.SendToServer()
+    end
+    AddToList(clearButton, lst)
+
+    local resetButton = xlib.makebutton{w=150, label="Reset configs to default", parent=lst }
+    resetButton.DoClick=function()
+        net.Start("rdmtreset")
+        net.SendToServer()
+    end
+    AddToList(resetButton, lst)
+
+    local randomButton = xlib.makebutton{w=150, label="Trigger random event", parent=lst }
+    randomButton.DoClick=function()
+        net.Start("rdmtrandom")
+        net.SendToServer()
+    end
+    AddToList(randomButton, lst)
+
+    local resetWeightsButton = xlib.makebutton{w=150, label="Reset event weights", parent=lst }
+    resetWeightsButton.DoClick=function()
+        net.Start("rdmtresetweights")
+        net.SendToServer()
+    end
+    AddToList(resetWeightsButton, lst)
+
+    local clearHistoryButton = xlib.makebutton{w=150, label="Clear event history", parent=lst }
+    clearHistoryButton.DoClick=function()
+        net.Start("rdmtclearhistory")
+        net.SendToServer()
+    end
+    AddToList(clearHistoryButton, lst)
+
+    xgui.hookEvent("onProcessModules", nil, pnl.processModules)
+    xgui.addSubModule(config_label, pnl, nil, "randomat_settings")
 end
 
 net.Receive("randomatULXEventsTransfer", function()
@@ -175,107 +288,8 @@ net.Receive("randomatULXEventsTransfer", function()
     local compressedString = net.ReadData(len)
     local importEventsJson = util.Decompress(compressedString)
     local importedEvents = util.JSONToTable(importEventsJson)
-    loadRandomatULXEvents(importedEvents)
+    local eventids = LoadRandomatULXEvents(importedEvents)
+    SetupGeneralSettings(eventids)
     -- Reload the modules since by this time its usually loaded already
     xgui.processModules()
 end)
-
------------General-Settings----------------------
-local pnl = xlib.makelistlayout{ w=415, h=315, parent=xgui.null }
-pnl.scroll:SetSize(414, 315)
-
-local lst = vgui.Create("DListLayout", pnl)
-lst:SetPos(5, 25)
-lst:SetSize(415, 315)
-lst:DockPadding(0, 5, 0, 0)
-
-local labeltxt = xlib.makelabel{label="Randomat Configs", parent=lst, font="TitleLabel"}
-lst:Add(labeltxt)
-
-local rdmtauto = xlib.makecheckbox{label="Auto randomat on round start", repconvar="rep_ttt_randomat_auto", parent=lst}
-AddToList(rdmtauto, lst)
-
-local rdmtautorounds = xlib.makeslider{label="Auto randomat min. rounds", repconvar="rep_ttt_randomat_auto_min_rounds", min=0,max=20, parent=lst}
-AddToList(rdmtautorounds, lst)
-
-local rdmtautochance = xlib.makeslider{label="Auto randomat chance", repconvar="rep_ttt_randomat_auto_chance", min=0,max=1,decimal=2, parent=lst}
-AddToList(rdmtautochance, lst)
-
-local rdmtautosilent = xlib.makecheckbox{label="Auto randomats are silent", repconvar="rep_ttt_randomat_auto_silent", parent=lst}
-AddToList(rdmtautosilent, lst)
-
-local rdmtautochoose = xlib.makecheckbox{label="Auto randomat is always \"choose\"", repconvar="rep_ttt_randomat_auto_choose", parent=lst}
-AddToList(rdmtautochoose, lst)
-
-local rdmtrebuy = xlib.makecheckbox{label="Rebuyable randomat (Requires restart)", repconvar="rep_ttt_randomat_rebuyable", parent=lst}
-AddToList(rdmtrebuy, lst)
-
-local rdmtchoice = xlib.makecheckbox{label="Choose events (See settings in 'Choose' event config)", repconvar="rep_ttt_randomat_chooseevent", parent=lst}
-AddToList(rdmtchoice, lst)
-
-local rdmteventweight = xlib.makeslider{label="Default event selection weight", repconvar="rep_ttt_randomat_event_weight", min=1,max=50, parent=lst}
-AddToList(rdmteventweight, lst)
-
-local rdmthint = xlib.makecheckbox{label="Give event hints", repconvar="rep_ttt_randomat_event_hint", parent=lst}
-AddToList(rdmthint, lst)
-
-local rdmthintchat = xlib.makecheckbox{label="Give event hints in chat", repconvar="rep_ttt_randomat_event_hint_chat", parent=lst}
-AddToList(rdmthintchat, lst)
-
-local rdmthistory = xlib.makeslider{label="Historical event tracking count", repconvar="rep_ttt_randomat_event_history", min=0,max=100, parent=lst}
-AddToList(rdmthistory, lst)
-
-local rdmtclientlist = xlib.makecheckbox{label="Allow clients to see active event list", repconvar="rep_ttt_randomat_allow_client_list", parent=lst}
-AddToList(rdmtclientlist, lst)
-
-local enableButton = xlib.makebutton{w=150, label="Enable all events", parent=lst }
-enableButton.DoClick=function()
-    net.Start("rdmtenableall")
-    net.SendToServer()
-end
-AddToList(enableButton, lst)
-
-local disableButton = xlib.makebutton{ w=150, label="Disable all events", parent=lst }
-disableButton.DoClick=function()
-    net.Start("rdmtdisableall")
-    net.SendToServer()
-end
-AddToList(disableButton, lst)
-
-local clearButton = xlib.makebutton{w=150, label="Clear all active events", parent=lst }
-clearButton.DoClick=function()
-    net.Start("rdmtclear")
-    net.SendToServer()
-end
-AddToList(clearButton, lst)
-
-local resetButton = xlib.makebutton{w=150, label="Reset configs to default", parent=lst }
-resetButton.DoClick=function()
-    net.Start("rdmtreset")
-    net.SendToServer()
-end
-AddToList(resetButton, lst)
-
-local randomButton = xlib.makebutton{w=150, label="Trigger random event", parent=lst }
-randomButton.DoClick=function()
-    net.Start("rdmtrandom")
-    net.SendToServer()
-end
-AddToList(randomButton, lst)
-
-local resetWeightsButton = xlib.makebutton{w=150, label="Reset event weights", parent=lst }
-resetWeightsButton.DoClick=function()
-    net.Start("rdmtresetweights")
-    net.SendToServer()
-end
-AddToList(resetWeightsButton, lst)
-
-local clearHistoryButton = xlib.makebutton{w=150, label="Clear event history", parent=lst }
-clearHistoryButton.DoClick=function()
-    net.Start("rdmtclearhistory")
-    net.SendToServer()
-end
-AddToList(clearHistoryButton, lst)
-
-xgui.hookEvent("onProcessModules", nil, pnl.processModules)
-xgui.addSubModule(config_label, pnl, nil, "randomat_settings")
