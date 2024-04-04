@@ -1,7 +1,8 @@
 --Only execute the following code if it's a terrortown gamemode
 if GetConVar("gamemode"):GetString() ~= "terrortown" then return end
 
-util.AddNetworkString("randomatULXEventsTransfer")
+util.AddNetworkString("RDMTULXEventsTransfer_Part")
+util.AddNetworkString("RDMTULXEventsTransfer_Complete")
 
 local commands = {}
 local function init()
@@ -35,7 +36,9 @@ end
 
 local function MinimizeNumberConVarData(data)
     local min = MinimizeConVarData(data)
-    min.e = data.dcm or 0
+    if data.dcm then
+        min.e = data.dcm
+    end
     if data.min then
         min.m = math.Round(data.min, min.e)
     end
@@ -45,7 +48,7 @@ local function MinimizeNumberConVarData(data)
     return min
 end
 
-local newevents = {}
+local events = {}
 hook.Add("Initialize", "InitRandomatULXEventTransfer", function()
     for _, v in pairs(Randomat.Events) do
         local convar = "ttt_randomat_" .. v.id
@@ -92,7 +95,7 @@ hook.Add("Initialize", "InitRandomatULXEventTransfer", function()
                 end
             end
 
-            newevents[v.id] = data
+            events[v.id] = data
 
             if ConVarExists(convar) then
                 table.insert(commands, convar)
@@ -132,15 +135,42 @@ hook.Add("Initialize", "InitRandomatULXEventTransfer", function()
 end)
 
 hook.Add("PlayerInitialSpawn", "sendCombinedULXEventsTable", function(ply)
-    local neweventsJSON = util.TableToJSON(newevents)
-    local compressedString = util.Compress(neweventsJSON)
+    local eventsJSON = util.TableToJSON(events)
+    local compressedString = util.Compress(eventsJSON)
     local len = #compressedString
     timer.Simple(1, function()
+        if not IsValid(ply) then return end
+
         print("[RANDOMAT IMPORT EVENT ULX] Transfering randomat addon tables to: " .. tostring(ply))
-        net.Start("randomatULXEventsTransfer")
-        net.WriteUInt(len, 16)
-        net.WriteData(compressedString, len)
-        net.Send(ply)
+
+        local blockSize = 2560
+        local blockDelay = 1
+        local idx = 1
+        local parts = math.ceil(len / blockSize)
+        timer.Create("RDMTULXEventsTransfer_" .. ply:EntIndex(), blockDelay, parts, function()
+            if not IsValid(ply) then return end
+
+            local sendSize = len
+            if sendSize > blockSize then
+                sendSize = blockSize
+            end
+
+            net.Start("RDMTULXEventsTransfer_Part")
+            net.WriteUInt(sendSize, 16)
+            net.WriteData(string.sub(compressedString, idx, idx + sendSize))
+            net.Send(ply)
+
+            -- Move up the string
+            idx = idx + sendSize
+
+            -- Keep track of how much we've sent
+            len = len - sendSize
+            -- If we've sent everything, tell the client
+            if len <= 0 then
+                net.Start("RDMTULXEventsTransfer_Complete")
+                net.Send(ply)
+            end
+        end)
     end)
 end)
 

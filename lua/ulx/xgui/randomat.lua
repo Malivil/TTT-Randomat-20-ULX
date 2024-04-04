@@ -283,13 +283,20 @@ local function SetupGeneralSettings(eventids)
     xgui.addSubModule(config_label, pnl, nil, "randomat_settings")
 end
 
-net.Receive("randomatULXEventsTransfer", function()
+local compressedString = ""
+net.Receive("RDMTULXEventsTransfer_Part", function()
     local len = net.ReadUInt(16)
-    local compressedString = net.ReadData(len)
+    compressedString = compressedString .. net.ReadData(len)
+end)
+
+net.Receive("RDMTULXEventsTransfer_Complete", function()
     local importEventsJson = util.Decompress(compressedString)
     local importedEvents = util.JSONToTable(importEventsJson)
     local eventids = LoadRandomatULXEvents(importedEvents)
     SetupGeneralSettings(eventids)
     -- Reload the modules since by this time its usually loaded already
     xgui.processModules()
+
+    -- Reset the compressed string to save space
+    compressedString = ""
 end)
