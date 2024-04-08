@@ -1,6 +1,7 @@
 --Only execute the following code if it's a terrortown gamemode
 if GetConVar("gamemode"):GetString() ~= "terrortown" then return end
 
+util.AddNetworkString("RDMTULXEventsTransfer_Request")
 util.AddNetworkString("RDMTULXEventsTransfer_Part")
 util.AddNetworkString("RDMTULXEventsTransfer_Complete")
 
@@ -134,10 +135,10 @@ hook.Add("Initialize", "InitRandomatULXEventTransfer", function()
     end
 end)
 
-hook.Add("PlayerInitialSpawn", "sendCombinedULXEventsTable", function(ply)
+net.Receive("RDMTULXEventsTransfer_Request", function(len, ply)
     local eventsJSON = util.TableToJSON(events)
     local compressedString = util.Compress(eventsJSON)
-    local len = #compressedString
+    local compressedLen = #compressedString
     timer.Simple(1, function()
         if not IsValid(ply) then return end
 
@@ -146,11 +147,11 @@ hook.Add("PlayerInitialSpawn", "sendCombinedULXEventsTable", function(ply)
         local blockSize = 2560
         local blockDelay = 1
         local idx = 1
-        local parts = math.ceil(len / blockSize)
+        local parts = math.ceil(compressedLen / blockSize)
         timer.Create("RDMTULXEventsTransfer_" .. ply:EntIndex(), blockDelay, parts, function()
             if not IsValid(ply) then return end
 
-            local sendSize = len
+            local sendSize = compressedLen
             if sendSize > blockSize then
                 sendSize = blockSize
             end
@@ -164,9 +165,9 @@ hook.Add("PlayerInitialSpawn", "sendCombinedULXEventsTable", function(ply)
             idx = idx + sendSize
 
             -- Keep track of how much we've sent
-            len = len - sendSize
+            compressedLen = compressedLen - sendSize
             -- If we've sent everything, tell the client
-            if len <= 0 then
+            if compressedLen <= 0 then
                 net.Start("RDMTULXEventsTransfer_Complete")
                 net.Send(ply)
             end

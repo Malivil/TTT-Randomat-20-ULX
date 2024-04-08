@@ -283,6 +283,11 @@ local function SetupGeneralSettings(eventids)
     xgui.addSubModule(config_label, pnl, nil, "randomat_settings")
 end
 
+hook.Add("InitPostEntity", "RandomatULXEventsRequest_InitPostEntity", function()
+    net.Start("RDMTULXEventsTransfer_Request")
+    net.SendToServer()
+end)
+
 local compressedString = ""
 net.Receive("RDMTULXEventsTransfer_Part", function()
     local len = net.ReadUInt(16)
