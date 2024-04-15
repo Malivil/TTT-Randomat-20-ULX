@@ -295,6 +295,8 @@ net.Receive("RDMTULXEventsTransfer_Part", function()
 end)
 
 net.Receive("RDMTULXEventsTransfer_Complete", function()
+    print("[RANDOMAT IMPORT EVENT ULX] Final part received, reloading...")
+
     local importEventsJson = util.Decompress(compressedString)
     local importedEvents = util.JSONToTable(importEventsJson)
     local eventids = LoadRandomatULXEvents(importedEvents)
