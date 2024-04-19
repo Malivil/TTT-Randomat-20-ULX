@@ -145,12 +145,8 @@ net.Receive("RDMTULXEventsTransfer_Request", function(len, ply)
         print("[RANDOMAT IMPORT EVENT ULX] Transfering randomat addon tables to: " .. tostring(ply))
 
         local blockSize = 2560
-        local blockDelay = 1
         local idx = 1
-        local parts = math.ceil(compressedLen / blockSize)
-        timer.Create("RDMTULXEventsTransfer_" .. ply:EntIndex(), blockDelay, parts, function()
-            if not IsValid(ply) then return end
-
+        while (compressedLen > 0) do
             local sendSize = compressedLen
             if sendSize > blockSize then
                 sendSize = blockSize
@@ -166,12 +162,11 @@ net.Receive("RDMTULXEventsTransfer_Request", function(len, ply)
 
             -- Keep track of how much we've sent
             compressedLen = compressedLen - sendSize
-            -- If we've sent everything, tell the client
-            if compressedLen <= 0 then
-                net.Start("RDMTULXEventsTransfer_Complete")
-                net.Send(ply)
-            end
-        end)
+        end
+
+        -- We've sent everything, so tell the client
+        net.Start("RDMTULXEventsTransfer_Complete")
+        net.Send(ply)
     end)
 end)
 

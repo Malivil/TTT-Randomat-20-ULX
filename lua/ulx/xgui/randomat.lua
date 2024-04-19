@@ -283,10 +283,16 @@ local function SetupGeneralSettings(eventids)
     xgui.addSubModule(config_label, pnl, nil, "randomat_settings")
 end
 
-hook.Add("InitPostEntity", "RandomatULXEventsRequest_InitPostEntity", function()
+local opened = false
+xgui.hookEvent("onOpen", nil, function()
+    if opened then return end
+    opened = true
+
+    print("[RANDOMAT IMPORT EVENT ULX] Requesting events list...")
+
     net.Start("RDMTULXEventsTransfer_Request")
     net.SendToServer()
-end)
+end, "RdmtULXOpen")
 
 local compressedString = ""
 net.Receive("RDMTULXEventsTransfer_Part", function()
