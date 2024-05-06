@@ -1,3 +1,6 @@
 if SERVER then
-resource.AddWorkshop( "314701418" )
+    -- TTT Silk Icon
+    resource.AddWorkshop("314701418")
+    -- This
+    resource.AddWorkshop("2096758509")
 end

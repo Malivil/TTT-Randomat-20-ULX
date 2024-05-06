@@ -217,6 +217,9 @@ local function SetupGeneralSettings(eventids)
     local rdmthintchat = xlib.makecheckbox{label="Give event hints in chat", repconvar="rep_ttt_randomat_event_hint_chat", parent=lst}
     AddToList(rdmthintchat, lst)
 
+    local rdmthintchatsecret = xlib.makecheckbox{label="Show secret events at round end", repconvar="ttt_randomat_event_hint_chat_secret", parent=lst}
+    AddToList(rdmthintchatsecret, lst)
+
     local rdmthistory = xlib.makeslider{label="Historical event tracking count", repconvar="rep_ttt_randomat_event_history", min=0,max=100, parent=lst}
     AddToList(rdmthistory, lst)
 
