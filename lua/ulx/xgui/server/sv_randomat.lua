@@ -110,6 +110,12 @@ hook.Add("Initialize", "InitRandomatULXEventTransfer", function()
                 ULib.replicatedWritableCvar(min_players, "rep_" .. min_players, GetConVar(min_players):GetString(), false, false, "xgui_gmsettings")
             end
 
+            local selectable = convar .. "_selectable"
+            if ConVarExists(selectable) then
+                table.insert(commands, selectable)
+                ULib.replicatedWritableCvar(selectable, "rep_" .. selectable, GetConVar(selectable):GetString(), false, false, "xgui_gmsettings")
+            end
+
             local weight = convar .. "_weight"
             if ConVarExists(weight) then
                 table.insert(commands, weight)
