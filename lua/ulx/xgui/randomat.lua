@@ -126,7 +126,7 @@ local function LoadRandomatULXEvents(eventsULX)
         local enable = xlib.makecheckbox{label="Enabled", repconvar="rep_ttt_randomat_"..k, parent=lst}
         AddToList(enable, lst)
 
-        local min_players = xlib.makeslider{label="Minimum required players", repconvar="rep_ttt_randomat_"..k.."_min_players", min=0, max=32, 0, parent=lst}
+        local min_players = xlib.makeslider{label="Minimum required players", repconvar="rep_ttt_randomat_"..k.."_min_players", min=v.mp.m, max=v.mp.x, 0, parent=lst}
         AddToList(min_players, lst)
 
         local weight = xlib.makeslider{label="Event selection weight", repconvar="rep_ttt_randomat_"..k.."_weight", min=-1, max=50, 0, parent=lst}

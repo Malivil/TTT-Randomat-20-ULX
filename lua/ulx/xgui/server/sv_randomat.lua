@@ -82,22 +82,40 @@ hook.Add("Initialize", "InitRandomatULXEventTransfer", function()
                 data.s = {}
                 for _, s in ipairs(sliders) do
                     table.insert(data.s, MinimizeNumberConVarData(s))
+
+                    local cmd = "randomat_" .. v.id .. "_" .. s.cmd
+                    if ConVarExists(cmd) then
+                        table.insert(commands, cmd)
+                        ULib.replicatedWritableCvar(cmd, "rep_" .. cmd, GetConVar(cmd):GetString(), false, false, "xgui_gmsettings")
+                    end
                 end
             end
+
             if checks and #checks > 0 then
                 data.c = {}
                 for _, c in ipairs(checks) do
                     table.insert(data.c, MinimizeConVarData(c))
+
+                    local cmd = "randomat_" .. v.id .. "_" .. c.cmd
+                    if ConVarExists(cmd) then
+                        table.insert(commands, cmd)
+                        ULib.replicatedWritableCvar(cmd, "rep_" .. cmd, GetConVar(cmd):GetString(), false, false, "xgui_gmsettings")
+                    end
                 end
             end
+
             if textboxes and #textboxes > 0 then
                 data.t = {}
                 for _, t in ipairs(textboxes) do
                     table.insert(data.t, MinimizeConVarData(t))
+
+                    local cmd = "randomat_" .. v.id .. "_" .. t.cmd
+                    if ConVarExists(cmd) then
+                        table.insert(commands, cmd)
+                        ULib.replicatedWritableCvar(cmd, "rep_" .. cmd, GetConVar(cmd):GetString(), false, false, "xgui_gmsettings")
+                    end
                 end
             end
-
-            events[v.id] = data
 
             if ConVarExists(convar) then
                 table.insert(commands, convar)
@@ -107,7 +125,13 @@ hook.Add("Initialize", "InitRandomatULXEventTransfer", function()
             local min_players = convar .. "_min_players"
             if ConVarExists(min_players) then
                 table.insert(commands, min_players)
-                ULib.replicatedWritableCvar(min_players, "rep_" .. min_players, GetConVar(min_players):GetString(), false, false, "xgui_gmsettings")
+
+                local min_cvar = GetConVar(min_players)
+                data.mp = {
+                    m = min_cvar:GetMin(),
+                    x = min_cvar:GetMax()
+                }
+                ULib.replicatedWritableCvar(min_players, "rep_" .. min_players, min_cvar:GetString(), false, false, "xgui_gmsettings")
             end
 
             local weight = convar .. "_weight"
@@ -116,22 +140,7 @@ hook.Add("Initialize", "InitRandomatULXEventTransfer", function()
                 ULib.replicatedWritableCvar(weight, "rep_" .. weight, GetConVar(weight):GetString(), false, false, "xgui_gmsettings")
             end
 
-            local numeric = table.Add(table.Add({}, sliders or {}), checks or {})
-            for _, cv in pairs(numeric) do
-                local cmd = "randomat_" .. v.id .. "_" .. cv.cmd
-                if ConVarExists(cmd) then
-                    table.insert(commands, cmd)
-                    ULib.replicatedWritableCvar(cmd, "rep_" .. cmd, GetConVar(cmd):GetString(), false, false, "xgui_gmsettings")
-                end
-            end
-
-            for _, cv in pairs(textboxes or {}) do
-                local cmd = "randomat_" .. v.id .. "_" .. cv.cmd
-                if ConVarExists(cmd) then
-                    table.insert(commands, cmd)
-                    ULib.replicatedWritableCvar(cmd, "rep_" .. cmd, GetConVar(cmd):GetString(), false, false, "xgui_gmsettings")
-                end
-            end
+            events[v.id] = data
         end
     end
 end)
