@@ -184,7 +184,7 @@ end)
 -- Chat commands --
 -------------------
 
-local WRONG_GAMEMODE = "The current gamemode is not trouble in terrorist town!"
+local WRONG_GAMEMODE = "The current gamemode is not Trouble in Terrorist Town!"
 local CATEGORY_NAME = "Randomat"
 
 ulx.rdmt_events = {}
@@ -223,6 +223,63 @@ rdmt:addParam { type = ULib.cmds.BoolArg, invisible = true }
 rdmt:defaultAccess(ULib.ACCESS_SUPERADMIN)
 rdmt:setOpposite("ulx srdmt", { _, _, true }, "!srdmt", true)
 rdmt:help("Starts a Randomat event with the given ID")
+
+local next_round_rdmt = nil
+hook.Add("TTTRandomatShouldAuto", "ULX_TTTRandomatShouldAuto", function(should_auto)
+    if not next_round_rdmt then return end
+
+    -- Save these and clear the tracking variable so if the trigger errors, it doesn't keep happening every round
+    local id = next_round_rdmt.id
+    local owner = next_round_rdmt.owner
+    local safe = next_round_rdmt.safe
+    next_round_rdmt = nil
+
+    if safe then
+        Randomat:SafeTriggerEvent(id, owner, true)
+    else
+        Randomat:TriggerEvent(id, owner)
+    end
+    return false
+end)
+
+function ulx.rdmtnr(calling_ply, target_event, safe)
+    if GetConVar("gamemode"):GetString() ~= "terrortown" then
+        ULib.tsayError(calling_ply, WRONG_GAMEMODE, true)
+        return
+    end
+
+    next_round_rdmt = { id = target_event, owner = calling_ply }
+    local method = ""
+    if safe then
+        method = "safely "
+        next_round_rdmt.safe = safe
+    end
+    ulx.fancyLogAdmin(calling_ply, true, "#A scheduled a Randomat event with an ID of #s to " .. method .. "start next round.", target_event)
+end
+
+local rdmtnr = ulx.command(CATEGORY_NAME, "ulx rdmtnr", ulx.rdmtnr, "!rdmtnr")
+rdmtnr:addParam { type = ULib.cmds.StringArg, completes = ulx.rdmt_events, hint = "Event ID", error = "Invalid Event ID \"%s\" specified", ULib.cmds.restrictToCompletes }
+rdmtnr:addParam { type = ULib.cmds.BoolArg, invisible = true }
+rdmtnr:defaultAccess(ULib.ACCESS_SUPERADMIN)
+rdmtnr:setOpposite("ulx srdmtnr", { _, _, true }, "!srdmtnr", true)
+rdmtnr:help("Starts a Randomat event with the given ID next round")
+
+function ulx.clearnr(calling_ply)
+    if GetConVar("gamemode"):GetString() ~= "terrortown" then
+        ULib.tsayError(calling_ply, WRONG_GAMEMODE, true)
+        return
+    end
+
+    if next_round_rdmt == nil then
+        ULib.tsayError(calling_ply, "No event is scheduled for the next round!", true)
+    else
+        ulx.fancyLogAdmin(calling_ply, true, "#A has unscheduled a Randomat event with an ID of #s.", next_round_rdmt.id)
+    end
+end
+
+local clearnr = ulx.command(CATEGORY_NAME, "ulx clearnr", ulx.clearnr, "!clearnr")
+clearnr:defaultAccess(ULib.ACCESS_SUPERADMIN)
+clearnr:help("Clears the scheduled Randomat event if there is one")
 
 function ulx.clearevent(calling_ply, target_event)
     if GetConVar("gamemode"):GetString() ~= "terrortown" then
