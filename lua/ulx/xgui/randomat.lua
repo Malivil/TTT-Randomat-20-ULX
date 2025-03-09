@@ -112,6 +112,9 @@ local function LoadRandomatULXEvents(eventsULX)
             lst:Add(labeltxt)
         end
 
+        local idtxt = xlib.makelabel{label="ID: " .. k, parent=lst, tooltip=k}
+        lst:Add(idtxt)
+
         if v.d ~= "" and v.d ~= nil then
             local labeltxt = xlib.makelabel{label=v.d, parent=lst, tooltip=v.d}
             AddToList(labeltxt, lst)
