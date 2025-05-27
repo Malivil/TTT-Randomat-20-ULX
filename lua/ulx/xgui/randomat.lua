@@ -312,10 +312,10 @@ net.Receive("RDMTULXEventsTransfer_Complete", function()
     print("[RANDOMAT IMPORT EVENT ULX] Final part received, reloading...")
 
     local cvarCount = table.Count(compressedCvars)
-	local compressedString = ""
-	for idx = 1, cvarCount do
-		compressedString = compressedString .. compressedCvars[idx]
-	end
+    local compressedString = ""
+    for idx = 1, cvarCount do
+        compressedString = compressedString .. compressedCvars[idx]
+    end
 
     local importEventsJson = util.Decompress(compressedString)
     local importedEvents = util.JSONToTable(importEventsJson)
