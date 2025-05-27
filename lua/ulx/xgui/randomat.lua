@@ -301,14 +301,21 @@ xgui.hookEvent("onOpen", nil, function()
     net.SendToServer()
 end, "RdmtULXOpen")
 
-local compressedString = ""
+local compressedCvars = {}
 net.Receive("RDMTULXEventsTransfer_Part", function()
     local len = net.ReadUInt(16)
-    compressedString = compressedString .. net.ReadData(len)
+    local idx = net.ReadUInt(16)
+    compressedCvars[idx] = net.ReadData(len)
 end)
 
 net.Receive("RDMTULXEventsTransfer_Complete", function()
     print("[RANDOMAT IMPORT EVENT ULX] Final part received, reloading...")
+
+    local cvarCount = table.Count(compressedCvars)
+	local compressedString = ""
+	for idx = 1, cvarCount do
+		compressedString = compressedString .. compressedCvars[idx]
+	end
 
     local importEventsJson = util.Decompress(compressedString)
     local importedEvents = util.JSONToTable(importEventsJson)
@@ -317,6 +324,6 @@ net.Receive("RDMTULXEventsTransfer_Complete", function()
     -- Reload the modules since by this time its usually loaded already
     xgui.processModules()
 
-    -- Reset the compressed string to save space
-    compressedString = ""
+    -- Reset the table to save space
+    compressedCvars = {}
 end)
