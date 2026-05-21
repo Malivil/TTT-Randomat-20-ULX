@@ -62,8 +62,8 @@ hook.Add("Initialize", "InitRandomatULXEventTransfer", function()
 
             local data = {}
             -- Only save the properties that are being used
-            local title = Randomat.GetEventTitle and Randomat:GetEventTitle(v) or v.Title
-            local altTitle = v.AltTitle
+            local title = Randomat.GetEventTitle and Randomat:GetEventTitle(v, true) or v.Title
+            local altTitle = Randomat.GetEventAltTitle and Randomat:GetEventAltTitle(v) or v.AltTitle
             if title and #title > 0 and title ~= altTitle then
                 data.n = title
             end
