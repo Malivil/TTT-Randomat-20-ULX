@@ -62,16 +62,21 @@ hook.Add("Initialize", "InitRandomatULXEventTransfer", function()
 
             local data = {}
             -- Only save the properties that are being used
-            if v.Title and #v.Title > 0 then
-                data.n = v.Title
+            local title = Randomat.GetEventTitle and Randomat:GetEventTitle(v) or v.Title
+            local altTitle = v.AltTitle
+            if title and #title > 0 and title ~= altTitle then
+                data.n = title
             end
-            if v.AltTitle and #v.AltTitle > 0 then
-                data.an = v.AltTitle
+            if altTitle and #altTitle > 0 then
+                data.an = altTitle
             end
             if v.ExtDescription and #v.ExtDescription > 0 then
                 data.d = v.ExtDescription
-            elseif v.Description and #v.Description > 0 then
-                data.d = v.Description
+            else
+                local description = Randomat.GetEventDescription and Randomat:GetEventDescription(v) or v.Description
+                if description and #description > 0 then
+                    data.d = description
+                end
             end
             if type(v.Categories) == "table" and #v.Categories > 0 then
                 data.ct = v.Categories
