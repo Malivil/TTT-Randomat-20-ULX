@@ -1,19 +1,44 @@
 surface.CreateFont("TitleLabel", {
     font = "Roboto",
-    size = 16
+    size = 22,
+    weight = 1000
 })
 
 local config_label = "- Randomat Configs -"
 local randomat_settings = xlib.makepanel{ parent=xgui.null }
 
 randomat_settings.panel = xlib.makepanel{ x=165, y=25, w=415, h=318, parent=randomat_settings }
+randomat_settings.title = xlib.makepanel{ x=165, y=2, w=415, h=21, parent=randomat_settings }
 randomat_settings.search = xlib.maketextbox{ x=5, y=2, w=155, h=21, enableinput=true, parent=randomat_settings }
 randomat_settings.catList = xlib.makelistview{ x=5, y=25, w=155, h=318, parent=randomat_settings }
 randomat_settings.catList:AddColumn("Events")
 randomat_settings.catList.Columns[1].DoClick = function() end
 
+randomat_settings.titleLabel = xlib.makelabel{
+    label = "",
+    x = 0,
+    y = 0,
+    w = 398,
+    parent = randomat_settings.title,
+    font = "TitleLabel",
+}
+
+randomat_settings.titleLabel:SetMouseInputEnabled(true)
+
 randomat_settings.catList.OnRowSelected = function(self, LineID, Line)
-    local nPanel = xgui.modules.submodule[Line:GetValue(2)].panel
+    local subModuleIndex = Line:GetValue(2)
+    local targetModule = xgui.modules.submodule[subModuleIndex]
+    local nPanel = targetModule.panel
+
+    if randomat_settings.titleLabel and targetModule then
+        if targetModule.name == config_label then
+            randomat_settings.titleLabel:SetText("Randomat Configs")
+            randomat_settings.titleLabel:SetTooltip("Randomat Configs")
+        else
+            randomat_settings.titleLabel:SetText(targetModule.displayTitle or targetModule.name)
+            randomat_settings.titleLabel:SetTooltip(targetModule.displayTitle or targetModule.name)
+        end
+    end
 
     if randomat_settings.curPanel ~= nil then
         randomat_settings.curPanel:SetZPos(-1)
@@ -29,7 +54,7 @@ randomat_settings.catList.OnRowSelected = function(self, LineID, Line)
         randomat_settings.curPanel = nil
     end
     xlib.animQueue_start()
-    if nPanel.onOpen then nPanel.onOpen() end --If the panel has it, call a function when it's opened
+    if nPanel.onOpen then nPanel.onOpen() end
 end
 
 --Process modular settings
@@ -94,23 +119,7 @@ local function LoadRandomatULXEvents(eventsULX)
         local lst = vgui.Create("DListLayout", pnl)
         lst:SetPos(5, 25)
         lst:SetSize(415, 315)
-        lst:DockPadding(0, 5, 0, 0)
-
-        local name = ""
-        if v.n ~= "" and v.n ~= nil then
-            name = name .. v.n
-        end
-        if v.an ~= "" and v.an ~= nil then
-            if string.len(name) == 0 then
-                name = v.an
-            else
-                name = name .. " (aka " .. v.an .. ")"
-            end
-        end
-        if name ~= "" then
-            local labeltxt = xlib.makelabel{label=name, parent=lst, tooltip=name, font="TitleLabel"}
-            lst:Add(labeltxt)
-        end
+        lst:DockPadding(0, 0, 0, 0)
 
         local idtxt = xlib.makelabel{label="ID: " .. k, parent=lst, tooltip=k}
         lst:Add(idtxt)
@@ -166,11 +175,37 @@ local function LoadRandomatULXEvents(eventsULX)
 
         xgui.hookEvent("onProcessModules", nil, pnl.processModules)
 
+        local fullDisplayName = ""
+
+        if v.n and v.n ~= "" then
+            fullDisplayName = v.n
+        end
+        if v.an and v.an ~= "" then
+            if fullDisplayName == "" then
+                fullDisplayName = v.an
+            else
+                fullDisplayName = fullDisplayName .. " (aka " .. v.an .. ")"
+            end
+        end
+
         if v.n ~= "" and v.n ~= nil then
             xgui.addSubModule(string.TrimLeft(v.n, "#"), pnl, nil, "randomat_settings")
+
+            local lastIdx = #xgui.modules.submodule
+            local subMod = xgui.modules.submodule[lastIdx]
+            if subMod then
+                subMod.displayTitle = fullDisplayName
+            end
         end
+
         if v.an ~= "" and v.an ~= nil then
             xgui.addSubModule(string.TrimLeft(v.an, "#"), pnl, nil, "randomat_settings")
+
+            local lastIdx = #xgui.modules.submodule
+            local subMod = xgui.modules.submodule[lastIdx]
+            if subMod then
+                subMod.displayTitle = fullDisplayName
+            end
         end
     end
 
@@ -186,9 +221,6 @@ local function SetupGeneralSettings(eventids)
     lst:SetPos(5, 25)
     lst:SetSize(415, 315)
     lst:DockPadding(0, 5, 0, 0)
-
-    local labeltxt = xlib.makelabel{label="Randomat Configs", parent=lst, font="TitleLabel"}
-    lst:Add(labeltxt)
 
     local rdmtauto = xlib.makecheckbox{label="Auto randomat on round start", repconvar="rep_ttt_randomat_auto", parent=lst}
     AddToList(rdmtauto, lst)
