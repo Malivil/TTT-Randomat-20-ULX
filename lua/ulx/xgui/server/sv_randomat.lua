@@ -82,11 +82,21 @@ hook.Add("Initialize", "InitRandomatULXEventTransfer", function()
                 data.ct = v.Categories
             end
 
-            -- Only bother sending the cvar lists that have entries
+            -- Prep for ordered list
+            local all_cvars = {}
+            local insertion_index = 1
+
+            -- Process separately for default ordering
             if sliders and #sliders > 0 then
                 data.s = {}
                 for _, s in ipairs(sliders) do
-                    table.insert(data.s, MinimizeNumberConVarData(s))
+                    local min_data = MinimizeNumberConVarData(s)
+                    if s.pos then min_data.pos = s.pos end
+                    table.insert(data.s, min_data)
+
+                    -- Include `sort_type` for sorting sliders -> checks -> textboxes, and orig. insertion order
+                    table.insert(all_cvars, {sort_type = 1, type = "s", data = min_data, pos = s.pos, idx = insertion_index})
+                    insertion_index = insertion_index + 1
 
                     local cmd = "randomat_" .. v.id .. "_" .. s.cmd
                     if ConVarExists(cmd) then
@@ -99,7 +109,12 @@ hook.Add("Initialize", "InitRandomatULXEventTransfer", function()
             if checks and #checks > 0 then
                 data.c = {}
                 for _, c in ipairs(checks) do
-                    table.insert(data.c, MinimizeConVarData(c))
+                    local min_data = MinimizeConVarData(c)
+                    if c.pos then min_data.pos = c.pos end
+                    table.insert(data.c, min_data)
+
+                    table.insert(all_cvars, { sort_type = 2, type = "c", data = min_data, pos = c.pos, idx = insertion_index })
+                    insertion_index = insertion_index + 1
 
                     local cmd = "randomat_" .. v.id .. "_" .. c.cmd
                     if ConVarExists(cmd) then
@@ -112,13 +127,45 @@ hook.Add("Initialize", "InitRandomatULXEventTransfer", function()
             if textboxes and #textboxes > 0 then
                 data.t = {}
                 for _, t in ipairs(textboxes) do
-                    table.insert(data.t, MinimizeConVarData(t))
+                    local min_data = MinimizeConVarData(t)
+                    if t.pos then min_data.pos = t.pos end
+                    table.insert(data.t, min_data)
+
+                    table.insert(all_cvars, { sort_type = 3, type = "t", data = min_data, pos = t.pos, idx = insertion_index })
+                    insertion_index = insertion_index + 1
 
                     local cmd = "randomat_" .. v.id .. "_" .. t.cmd
                     if ConVarExists(cmd) then
                         table.insert(commands, cmd)
                         ULib.replicatedWritableCvar(cmd, "rep_" .. cmd, GetConVar(cmd):GetString(), false, false, "xgui_gmsettings")
                     end
+                end
+            end
+
+            -- Do the actual sorting
+            if #all_cvars > 0 then
+                table.sort(all_cvars, function(a, b)
+                    -- Both have a specified position
+                    if a.pos and b.pos then
+                        if a.pos == b.pos then return a.idx < b.idx end
+                        return a.pos < b.pos
+                    end
+
+                    -- If only one has a position, put it first
+                    if a.pos then return true end
+                    if b.pos then return false end
+
+                    -- If neither have a position, use original ordering (sliders -> checks -> textboxes)
+                    if a.sort_type == b.sort_type then
+                        return a.idx < b.idx
+                    end
+                    return a.sort_type < b.sort_type
+                end)
+
+                -- Stick in a table to pass through to ULX
+                data.ordered = {}
+                for _, item in ipairs(all_cvars) do
+                    table.insert(data.ordered, {type = item.type, min_data = item.data})
                 end
             end
 

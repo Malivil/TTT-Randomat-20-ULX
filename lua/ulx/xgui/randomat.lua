@@ -135,26 +135,46 @@ local function LoadRandomatULXEvents(eventsULX)
         local weight = xlib.makeslider{label="Event selection weight", repconvar="rep_ttt_randomat_"..k.."_weight", min=-1, max=50, 0, parent=lst}
         AddToList(weight, lst)
 
-        if v.s ~= nil then
-            for _, j in pairs(v.s) do
-                local conslider = xlib.makeslider{label=j.d, repconvar="rep_randomat_"..k.."_"..j.c, min=j.m, max=j.x, decimal=j.e or 0, parent=lst}
-                AddToList(conslider, lst)
+        -- Draw elements for entries in the ordered list
+        if v.ordered then
+            for _, item in ipairs(v.ordered) do
+                local j = item.min_data
+                if item.type == "s" then
+                    local conslider = xlib.makeslider{label=j.d, repconvar="rep_randomat_"..k.."_"..j.c, min=j.m, max=j.x, decimal=j.e or 0, parent=lst}
+                    AddToList(conslider, lst)
+                elseif item.type == "c" then
+                    local concheck = xlib.makecheckbox{label=j.d, repconvar="rep_randomat_"..k.."_"..j.c, parent=lst}
+                    AddToList(concheck, lst)
+                elseif item.type == "t" then
+                    local labeltxt = xlib.makelabel{label=j.d, parent=lst}
+                    AddToList(labeltxt, lst)
+                    local contxt = xlib.maketextbox{repconvar="rep_randomat_"..k.."_"..j.c, enableinput=true, parent=lst}
+                    AddToList(contxt, lst)
+                end
             end
-        end
-
-        if v.c ~= nil then
-            for _, j in pairs(v.c) do
-                local concheck = xlib.makecheckbox{label=j.d, repconvar="rep_randomat_"..k.."_"..j.c, parent=lst}
-                AddToList(concheck, lst)
+        -- I think not strictly necessary, but good to have?
+        else
+            if v.s ~= nil then
+                for _, j in pairs(v.s) do
+                    local conslider = xlib.makeslider{label=j.d, repconvar="rep_randomat_"..k.."_"..j.c, min=j.m, max=j.x, decimal=j.e or 0, parent=lst}
+                    AddToList(conslider, lst)
+                end
             end
-        end
 
-        if v.t ~= nil then
-            for _, j in pairs(v.t) do
-                local labeltxt = xlib.makelabel{label=j.d, parent=lst}
-                AddToList(labeltxt, lst)
-                local contxt = xlib.maketextbox{repconvar="rep_randomat_"..k.."_"..j.c, enableinput=true, parent=lst}
-                AddToList(contxt, lst)
+            if v.c ~= nil then
+                for _, j in pairs(v.c) do
+                    local concheck = xlib.makecheckbox{label=j.d, repconvar="rep_randomat_"..k.."_"..j.c, parent=lst}
+                    AddToList(concheck, lst)
+                end
+            end
+
+            if v.t ~= nil then
+                for _, j in pairs(v.t) do
+                    local labeltxt = xlib.makelabel{label=j.d, parent=lst}
+                    AddToList(labeltxt, lst)
+                    local contxt = xlib.maketextbox{repconvar="rep_randomat_"..k.."_"..j.c, enableinput=true, parent=lst}
+                    AddToList(contxt, lst)
+                end
             end
         end
 
