@@ -4,6 +4,22 @@ surface.CreateFont("TitleLabel", {
     weight = 1000
 })
 
+surface.CreateFont("HeaderUnderlined", {
+    font = "Tahoma",
+    size = 13,
+    weight = 700,
+    antialias = false,
+    underline = true
+})
+
+surface.CreateFont("HeaderUnderlined", {
+    font = "Tahoma",
+    size = 13,
+    weight = 700,
+    antialias = false,
+    underline = true
+})
+
 local config_label = "- Randomat Configs -"
 local randomat_settings = xlib.makepanel{ parent=xgui.null }
 
@@ -103,10 +119,28 @@ xgui.hookEvent("onProcessModules", nil, randomat_settings.processModules)
 xgui.addModule("Randomat", randomat_settings, "icon16/rdmt.png", "xgui_gmsettings")
 
 --------------------------------------------------------------
-local function AddToList(element, list)
+local function AddToList(element, list, leftIndent)
+    left = leftIndent or 0
+
     element:Dock(TOP)
-    element:DockMargin(0, 5, 0, 0)
+    element:DockMargin(left, 5, 0, 0)
     list:Add(element)
+end
+
+local function ClearRandomatModules()
+    randomat_settings.curPanel = nil
+
+    for i = #xgui.modules.submodule, 1, -1 do
+        local module = xgui.modules.submodule[i]
+
+        if module.mtype == "randomat_settings" then
+            if IsValid(module.panel) then
+                module.panel:Remove()
+            end
+            table.remove(xgui.modules.submodule, i)
+        end
+    end
+    randomat_settings.catList:Clear()
 end
 
 local function LoadRandomatULXEvents(eventsULX)
@@ -135,35 +169,132 @@ local function LoadRandomatULXEvents(eventsULX)
             AddToList(labeltxt, lst)
         end
 
-        local enable = xlib.makecheckbox{label="Enabled", repconvar="rep_ttt_randomat_"..k, parent=lst}
-        AddToList(enable, lst)
+        -- Default "Common Settings" group
+        local commonSettings = vgui.Create("DCollapsibleCategory", lst)
+        commonSettings:SetLabel("Common Settings")
+        commonSettings:SetExpanded(false)
+        AddToList(commonSettings, lst)
 
-        local min_players = xlib.makeslider{label="Minimum required players", repconvar="rep_ttt_randomat_"..k.."_min_players", min=v.mp.m, max=v.mp.x, 0, parent=lst}
-        AddToList(min_players, lst)
+        local commonList = vgui.Create("DListLayout", commonSettings)
+        commonSettings:SetContents(commonList)
 
-        local weight = xlib.makeslider{label="Event selection weight", repconvar="rep_ttt_randomat_"..k.."_weight", min=-1, max=50, 0, parent=lst}
-        AddToList(weight, lst)
-
-        if v.s ~= nil then
-            for _, j in pairs(v.s) do
-                local conslider = xlib.makeslider{label=j.d, repconvar="rep_randomat_"..k.."_"..j.c, min=j.m, max=j.x, decimal=j.e or 0, parent=lst}
-                AddToList(conslider, lst)
-            end
+        commonList:DockMargin(5, 0, 0, 0)
+        commonSettings:SetPaintBackground(true)
+        commonSettings.Paint = function(self, width, height)
+            surface.SetDrawColor(113, 184, 251, 255)
+            surface.DrawRect(0, 0, width, height)
         end
 
-        if v.c ~= nil then
-            for _, j in pairs(v.c) do
-                local concheck = xlib.makecheckbox{label=j.d, repconvar="rep_randomat_"..k.."_"..j.c, parent=lst}
-                AddToList(concheck, lst)
-            end
-        end
+        local enable = xlib.makecheckbox{label="Enabled", repconvar="rep_ttt_randomat_"..k, parent=commonList}
+        AddToList(enable, commonList)
 
-        if v.t ~= nil then
-            for _, j in pairs(v.t) do
-                local labeltxt = xlib.makelabel{label=j.d, parent=lst}
-                AddToList(labeltxt, lst)
-                local contxt = xlib.maketextbox{repconvar="rep_randomat_"..k.."_"..j.c, enableinput=true, parent=lst}
-                AddToList(contxt, lst)
+        local min_players = xlib.makeslider{label="Minimum required players", repconvar="rep_ttt_randomat_"..k.."_min_players", min=v.mp.m, max=v.mp.x, 0, parent=commonList}
+        AddToList(min_players, commonList)
+
+        local weight = xlib.makeslider{label="Event selection weight", repconvar="rep_ttt_randomat_"..k.."_weight", min=-1, max=50, 0, parent=commonList}
+        AddToList(weight, commonList)
+
+        if v.ordered then
+            for _, item in ipairs(v.ordered) do
+                -- t = type
+                if item.t == "grp" then
+                    local currentParentList = lst
+
+                    -- cb = collapsible, n = name, ex = expanded
+                    if item.cb then
+                        local collapsibleGroup = vgui.Create("DCollapsibleCategory", lst)
+                        collapsibleGroup:SetLabel(item.n)
+                        collapsibleGroup:SetExpanded(item.ex and item.ex or false)
+                        AddToList(collapsibleGroup, lst)
+
+                        local childList = vgui.Create("DListLayout", collapsibleGroup)
+                        collapsibleGroup:SetContents(childList)
+                        currentParentList = childList
+
+                        currentParentList:DockMargin(5, 0, 0, 0)
+                        collapsibleGroup:SetPaintBackground(true)
+                        collapsibleGroup.Paint = function(self, width, height)
+                            surface.SetDrawColor(113, 184, 251, 255)
+                            surface.DrawRect(0, 0, width, height)
+                        end
+                    else
+                        local header = xlib.makelabel{label=item.n, parent=lst}
+                        header:SetFont("HeaderUnderlined")
+                        AddToList(header, lst)
+                    end
+
+                    -- ch = children
+                    for _, child in ipairs(item.ch) do
+                        -- md = min_data
+                        local j = child.md
+                        if child.t == "s" then
+                            local conslider = xlib.makeslider{label=j.d, repconvar="rep_randomat_"..k.."_"..j.c, min=j.m, max=j.x, decimal=j.e or 0, parent=currentParentList}
+                            if item.cb then
+                                AddToList(conslider, currentParentList)
+                            else
+                                AddToList(conslider, currentParentList, 15)
+                            end
+                        elseif child.t == "c" then
+                            local concheck = xlib.makecheckbox{label=j.d, repconvar="rep_randomat_"..k.."_"..j.c, parent=currentParentList}
+                            if item.cb then
+                                AddToList(concheck, currentParentList)
+                            else
+                                AddToList(concheck, currentParentList, 15)
+                            end
+                        elseif child.t == "t" then
+                            local labeltxt = xlib.makelabel{label=j.d, parent=currentParentList}
+                            if item.cb then
+                                AddToList(labeltxt, currentParentList)
+                            else
+                                AddToList(labeltxt, currentParentList, 15)
+                            end
+                            local contxt = xlib.maketextbox{repconvar="rep_randomat_"..k.."_"..j.c, enableinput=true, parent=currentParentList}
+                            if item.cb then
+                                AddToList(contxt, currentParentList)
+                            else
+                                AddToList(contxt, currentParentList, 15)
+                            end
+                        end
+                    end
+                else
+                    -- Ungrouped variables
+                    local j = item.md
+                    if item.t == "s" then
+                        local conslider = xlib.makeslider{label=j.d, repconvar="rep_randomat_"..k.."_"..j.c, min=j.m, max=j.x, decimal=j.e or 0, parent=lst}
+                        AddToList(conslider, lst)
+                    elseif item.t == "c" then
+                        local concheck = xlib.makecheckbox{label=j.d, repconvar="rep_randomat_"..k.."_"..j.c, parent=lst}
+                        AddToList(concheck, lst)
+                    elseif item.t == "t" then
+                        local labeltxt = xlib.makelabel{label=j.d, parent=lst}
+                        AddToList(labeltxt, lst)
+                        local contxt = xlib.maketextbox{repconvar="rep_randomat_"..k.."_"..j.c, enableinput=true, parent=lst}
+                        AddToList(contxt, lst)
+                    end
+                end
+            end
+        else
+            if v.s ~= nil then
+                for _, j in pairs(v.s) do
+                    local conslider = xlib.makeslider{label=j.d, repconvar="rep_randomat_"..k.."_"..j.c, min=j.m, max=j.x, decimal=j.e or 0, parent=lst}
+                    AddToList(conslider, lst)
+                end
+            end
+
+            if v.c ~= nil then
+                for _, j in pairs(v.c) do
+                    local concheck = xlib.makecheckbox{label=j.d, repconvar="rep_randomat_"..k.."_"..j.c, parent=lst}
+                    AddToList(concheck, lst)
+                end
+            end
+
+            if v.t ~= nil then
+                for _, j in pairs(v.t) do
+                    local labeltxt = xlib.makelabel{label=j.d, parent=lst}
+                    AddToList(labeltxt, lst)
+                    local contxt = xlib.maketextbox{repconvar="rep_randomat_"..k.."_"..j.c, enableinput=true, parent=lst}
+                    AddToList(contxt, lst)
+                end
             end
         end
 
@@ -212,6 +343,8 @@ local function LoadRandomatULXEvents(eventsULX)
     return eventids
 end
 
+local compressedCvars = {}
+
 local function SetupGeneralSettings(eventids)
     -----------General-Settings----------------------
     local pnl = xlib.makelistlayout{ w=415, h=315, parent=xgui.null }
@@ -221,6 +354,21 @@ local function SetupGeneralSettings(eventids)
     lst:SetPos(5, 25)
     lst:SetSize(415, 315)
     lst:DockPadding(0, 5, 0, 0)
+
+    local labeltxt = xlib.makelabel{label="Randomat Configs", parent=lst, font="TitleLabel"}
+    lst:Add(labeltxt)
+
+    local refreshButton = xlib.makebutton{w = 150, label = "Refresh Randomat List", parent = lst}
+
+    refreshButton.DoClick = function()
+        compressedCvars = {}
+        randomat_settings.search:SetValue("")
+
+        net.Start("RDMTULXEventsTransfer_Request")
+        net.SendToServer()
+    end
+
+    AddToList(refreshButton, lst)
 
     local rdmtauto = xlib.makecheckbox{label="Auto randomat on round start", repconvar="rep_ttt_randomat_auto", parent=lst}
     AddToList(rdmtauto, lst)
@@ -333,7 +481,7 @@ xgui.hookEvent("onOpen", nil, function()
     net.SendToServer()
 end, "RdmtULXOpen")
 
-local compressedCvars = {}
+compressedCvars = {}
 net.Receive("RDMTULXEventsTransfer_Part", function()
     local len = net.ReadUInt(16)
     local idx = net.ReadUInt(16)
@@ -351,6 +499,9 @@ net.Receive("RDMTULXEventsTransfer_Complete", function()
 
     local importEventsJson = util.Decompress(compressedString)
     local importedEvents = util.JSONToTable(importEventsJson)
+
+    ClearRandomatModules()
+
     local eventids = LoadRandomatULXEvents(importedEvents)
     SetupGeneralSettings(eventids)
     -- Reload the modules since by this time its usually loaded already

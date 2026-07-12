@@ -51,7 +51,11 @@ local function MinimizeNumberConVarData(data)
 end
 
 local events = {}
-hook.Add("Initialize", "InitRandomatULXEventTransfer", function()
+
+local function BuildRandomatULXData()
+    events = {}
+    commands = {}
+
     for _, v in pairs(Randomat.Events) do
         local convar = "ttt_randomat_" .. v.id
         if not table.HasValue(commands, convar) then
@@ -82,11 +86,50 @@ hook.Add("Initialize", "InitRandomatULXEventTransfer", function()
                 data.ct = v.Categories
             end
 
-            -- Only bother sending the cvar lists that have entries
+            -- Prep for ordered list
+            local allEntries = {}
+            local groupOrder = {}
+            local insertionIndex = 1
+
+            local function GetGroup(groupName)
+                if not groupOrder[groupName] then
+                    local groupConfig = (type(v.eventGrpData) == "table" and v.eventGrpData[groupName]) or {}
+
+                    local isCollapsible = groupConfig.collapsible and groupConfig.collapsible or false
+                    local isExpanded = groupConfig.expanded and groupConfig.expanded or false
+
+                    groupOrder[groupName] = {
+                        type = "group",
+                        name = groupName,
+                        collapsible = isCollapsible,
+                        expanded = isExpanded,
+                        pos = groupConfig.pos,
+                        children = {},
+                        -- idx as a fallback for sorting
+                        idx = insertionIndex
+                    }
+                    insertionIndex = insertionIndex + 1
+                    table.insert(allEntries, groupOrder[groupName])
+                end
+                return groupOrder[groupName]
+            end
+
+            -- Process Sliders
             if sliders and #sliders > 0 then
                 data.s = {}
                 for _, s in ipairs(sliders) do
-                    table.insert(data.s, MinimizeNumberConVarData(s))
+                    local min_data = MinimizeNumberConVarData(s)
+                    if s.pos then min_data.pos = s.pos end
+                    table.insert(data.s, min_data)
+
+                    local node = { sort_type = 1, type = "s", data = min_data, pos = s.pos, idx = insertionIndex }
+                    insertionIndex = insertionIndex + 1
+
+                    if s.grp then
+                        table.insert(GetGroup(s.grp).children, node)
+                    else
+                        table.insert(allEntries, node)
+                    end
 
                     local cmd = "randomat_" .. v.id .. "_" .. s.cmd
                     if ConVarExists(cmd) then
@@ -96,10 +139,22 @@ hook.Add("Initialize", "InitRandomatULXEventTransfer", function()
                 end
             end
 
+            -- Process Checkboxes
             if checks and #checks > 0 then
                 data.c = {}
                 for _, c in ipairs(checks) do
-                    table.insert(data.c, MinimizeConVarData(c))
+                    local min_data = MinimizeConVarData(c)
+                    if c.pos then min_data.pos = c.pos end
+                    table.insert(data.c, min_data)
+
+                    local node = { sort_type = 2, type = "c", data = min_data, pos = c.pos, idx = insertionIndex }
+                    insertionIndex = insertionIndex + 1
+
+                    if c.grp then
+                        table.insert(GetGroup(c.grp).children, node)
+                    else
+                        table.insert(allEntries, node)
+                    end
 
                     local cmd = "randomat_" .. v.id .. "_" .. c.cmd
                     if ConVarExists(cmd) then
@@ -109,15 +164,82 @@ hook.Add("Initialize", "InitRandomatULXEventTransfer", function()
                 end
             end
 
+            -- Process Textboxes
             if textboxes and #textboxes > 0 then
                 data.t = {}
                 for _, t in ipairs(textboxes) do
-                    table.insert(data.t, MinimizeConVarData(t))
+                    local min_data = MinimizeConVarData(t)
+                    if t.pos then min_data.pos = t.pos end
+                    table.insert(data.t, min_data)
+
+                    local node = { sort_type = 3, type = "t", data = min_data, pos = t.pos, idx = insertionIndex }
+                    insertionIndex = insertionIndex + 1
+
+                    if t.grp then
+                        table.insert(GetGroup(t.grp).children, node)
+                    else
+                        table.insert(allEntries, node)
+                    end
 
                     local cmd = "randomat_" .. v.id .. "_" .. t.cmd
                     if ConVarExists(cmd) then
                         table.insert(commands, cmd)
                         ULib.replicatedWritableCvar(cmd, "rep_" .. cmd, GetConVar(cmd):GetString(), false, false, "xgui_gmsettings")
+                    end
+                end
+            end
+
+            -- Sort entries within groups
+            for _, grp in pairs(groupOrder) do
+                if #grp.children > 0 then
+                    table.sort(grp.children, function(a, b)
+                        if a.pos and b.pos then
+                            if a.pos == b.pos then return a.idx < b.idx end
+                            return a.pos < b.pos
+                        end
+                        if a.pos then return true end
+                        if b.pos then return false end
+                        if a.sort_type == b.sort_type then return a.idx < b.idx end
+                        return a.sort_type < b.sort_type
+                    end)
+                end
+            end
+
+            -- Sort top-level bits (i.e. groups and standalone cvars)
+            if #allEntries > 0 then
+                table.sort(allEntries, function(a, b)
+                    -- Anything without a specified position goes last
+                    local posA = a.pos or 99
+                    local posB = b.pos or 99
+
+                    if a.type == "group" then posA = a.pos or 99 end
+                    if b.type == "group" then posB = b.pos or 99 end
+
+                    if posA ~= posB then
+                        return posA < posB
+                    end
+
+                    -- Use insertion order if there's a tie
+                    return a.idx < b.idx
+                end)
+
+                -- Stick in a nice minimised table to pass through to ULX
+                data.ordered = {}
+                for _, item in ipairs(allEntries) do
+                    if item.type == "group" then
+                        local min_children = {}
+                        for _, child in ipairs(item.children) do
+                            table.insert(min_children, {t = child.type, md = child.data})
+                        end
+                        table.insert(data.ordered, {
+                            t = "grp",
+                            n = item.name,
+                            cb = item.collapsible and item.collapsible or false,
+                            ex = item.expanded and item.collapsible or false,
+                            ch = min_children
+                        })
+                    else
+                        table.insert(data.ordered, {t = item.type, md = item.data})
                     end
                 end
             end
@@ -148,9 +270,13 @@ hook.Add("Initialize", "InitRandomatULXEventTransfer", function()
             events[v.id] = data
         end
     end
-end)
+end
+
+hook.Add("Initialize", "InitRandomatULXEventTransfer", BuildRandomatULXData)
 
 net.Receive("RDMTULXEventsTransfer_Request", function(len, ply)
+    BuildRandomatULXData()
+
     local eventsJSON = util.TableToJSON(events)
     local compressedString = util.Compress(eventsJSON)
     local compressedLen = #compressedString
