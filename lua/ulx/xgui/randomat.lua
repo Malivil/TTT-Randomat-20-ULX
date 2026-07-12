@@ -1,15 +1,6 @@
 surface.CreateFont("TitleLabel", {
-    font = "Roboto",
-    size = 22,
-    weight = 1000
-})
-
-surface.CreateFont("HeaderUnderlined", {
-    font = "Tahoma",
-    size = 13,
-    weight = 700,
-    antialias = false,
-    underline = true
+    font = "Roboto-Bold",
+    size = 21,
 })
 
 surface.CreateFont("HeaderUnderlined", {
@@ -22,6 +13,7 @@ surface.CreateFont("HeaderUnderlined", {
 
 local config_label = "- Randomat Configs -"
 local randomat_settings = xlib.makepanel{ parent=xgui.null }
+local compressedCvars = {}
 
 randomat_settings.panel = xlib.makepanel{ x=165, y=25, w=415, h=318, parent=randomat_settings }
 randomat_settings.title = xlib.makepanel{ x=165, y=2, w=415, h=21, parent=randomat_settings }
@@ -32,6 +24,7 @@ randomat_settings.catList.Columns[1].DoClick = function() end
 
 randomat_settings.titleLabel = xlib.makelabel{
     label = "",
+    tooltip = "",
     x = 0,
     y = 0,
     w = 398,
@@ -39,7 +32,23 @@ randomat_settings.titleLabel = xlib.makelabel{
     font = "TitleLabel",
 }
 
-randomat_settings.titleLabel:SetMouseInputEnabled(true)
+randomat_settings.refreshButton = xlib.makebutton{
+    x = 265,
+    y = 1,
+    h = 19,
+    w = 120,
+    label = "Refresh Randomat List",
+    parent = randomat_settings.title
+}
+randomat_settings.refreshButton:SetVisible(false)
+
+randomat_settings.refreshButton.DoClick = function()
+    compressedCvars = {}
+    randomat_settings.search:SetValue("")
+
+    net.Start("RDMTULXEventsTransfer_Request")
+    net.SendToServer()
+end
 
 randomat_settings.catList.OnRowSelected = function(self, LineID, Line)
     local subModuleIndex = Line:GetValue(2)
@@ -50,9 +59,17 @@ randomat_settings.catList.OnRowSelected = function(self, LineID, Line)
         if targetModule.name == config_label then
             randomat_settings.titleLabel:SetText("Randomat Configs")
             randomat_settings.titleLabel:SetTooltip("Randomat Configs")
+
+            if IsValid(randomat_settings.refreshButton) then
+                randomat_settings.refreshButton:SetVisible(true)
+            end
         else
             randomat_settings.titleLabel:SetText(targetModule.displayTitle or targetModule.name)
             randomat_settings.titleLabel:SetTooltip(targetModule.displayTitle or targetModule.name)
+
+            if IsValid(randomat_settings.refreshButton) then
+                randomat_settings.refreshButton:SetVisible(false)
+            end
         end
     end
 
@@ -113,6 +130,9 @@ randomat_settings.search.OnValueChange = function(box, value)
             randomat_settings.catList:RemoveLine(i)
         end
     end
+
+    randomat_settings.titleLabel:SetText("")
+    randomat_settings.titleLabel:SetTooltip("")
 end
 
 xgui.hookEvent("onProcessModules", nil, randomat_settings.processModules)
@@ -180,9 +200,11 @@ local function LoadRandomatULXEvents(eventsULX)
 
         commonList:DockMargin(5, 0, 0, 0)
         commonSettings:SetPaintBackground(true)
+
         commonSettings.Paint = function(self, width, height)
-            surface.SetDrawColor(113, 184, 251, 255)
+            surface.SetDrawColor(190, 222, 253)
             surface.DrawRect(0, 0, width, height)
+            derma.SkinHook("Paint", "CollapsibleCategory", self, width, height)
         end
 
         local enable = xlib.makecheckbox{label="Enabled", repconvar="rep_ttt_randomat_"..k, parent=commonList}
@@ -214,8 +236,9 @@ local function LoadRandomatULXEvents(eventsULX)
                         currentParentList:DockMargin(5, 0, 0, 0)
                         collapsibleGroup:SetPaintBackground(true)
                         collapsibleGroup.Paint = function(self, width, height)
-                            surface.SetDrawColor(113, 184, 251, 255)
+                            surface.SetDrawColor(190, 222, 253)
                             surface.DrawRect(0, 0, width, height)
+                            derma.SkinHook("Paint", "CollapsibleCategory", self, width, height)
                         end
                     else
                         local header = xlib.makelabel{label=item.n, parent=lst}
@@ -343,8 +366,6 @@ local function LoadRandomatULXEvents(eventsULX)
     return eventids
 end
 
-local compressedCvars = {}
-
 local function SetupGeneralSettings(eventids)
     -----------General-Settings----------------------
     local pnl = xlib.makelistlayout{ w=415, h=315, parent=xgui.null }
@@ -354,21 +375,6 @@ local function SetupGeneralSettings(eventids)
     lst:SetPos(5, 25)
     lst:SetSize(415, 315)
     lst:DockPadding(0, 5, 0, 0)
-
-    local labeltxt = xlib.makelabel{label="Randomat Configs", parent=lst, font="TitleLabel"}
-    lst:Add(labeltxt)
-
-    local refreshButton = xlib.makebutton{w = 150, label = "Refresh Randomat List", parent = lst}
-
-    refreshButton.DoClick = function()
-        compressedCvars = {}
-        randomat_settings.search:SetValue("")
-
-        net.Start("RDMTULXEventsTransfer_Request")
-        net.SendToServer()
-    end
-
-    AddToList(refreshButton, lst)
 
     local rdmtauto = xlib.makecheckbox{label="Auto randomat on round start", repconvar="rep_ttt_randomat_auto", parent=lst}
     AddToList(rdmtauto, lst)
