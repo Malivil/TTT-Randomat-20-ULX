@@ -65,9 +65,29 @@ local function BuildRandomatULXData()
     for _, v in pairs(Randomat.Events) do
         local convar = "ttt_randomat_" .. v.id
         if not table.HasValue(commands, convar) then
-            local sliders, checks, textboxes
+            local sliders, checks, textboxes, layout
             if v.GetConVars then
-                sliders, checks, textboxes = v:GetConVars()
+                sliders, checks, textboxes, layout = v:GetConVars()
+            end
+
+            local positions = {}
+            local groups = {}
+            if type(layout) == "table" then
+                for key, layoutData in pairs(layout) do
+                    if type(layoutData) == "table" then
+                        for k, item in pairs(layoutData.items or {}) do
+                            if type(k) == "number" then
+                                positions[item] = k
+                                groups[item] = key
+                            else
+                                positions[k] = item
+                                groups[k] = key
+                            end
+                        end
+                    else
+                        positions[key] = layoutData
+                    end
+                end
             end
 
             local data = {}
@@ -99,7 +119,7 @@ local function BuildRandomatULXData()
 
             local function GetGroup(groupName)
                 if not groupOrder[groupName] then
-                    local groupConfig = (type(v.eventGrpData) == "table" and v.eventGrpData[groupName]) or {}
+                    local groupConfig = (type(layout) == "table" and type(layout[groupName]) == "table" and layout[groupName]) or {}
 
                     local isCollapsible = groupConfig.collapsible and groupConfig.collapsible or false
                     local isExpanded = groupConfig.expanded and groupConfig.expanded or false
@@ -124,14 +144,18 @@ local function BuildRandomatULXData()
             if sliders and #sliders > 0 then
                 data.s = {}
                 for _, s in ipairs(sliders) do
+                    local sPos = s.pos or positions[s.cmd]
+                    local sGrp = s.grp or groups[s.cmd]
+
                     local min_data = MinimizeNumberConVarData(s)
+                    if sPos then min_data.pos = sPos end
                     table.insert(data.s, min_data)
 
-                    local node = { sort_type = 1, type = "s", data = min_data, pos = s.pos, idx = insertionIndex }
+                    local node = { sort_type = 1, type = "s", data = min_data, pos = sPos, idx = insertionIndex }
                     insertionIndex = insertionIndex + 1
 
-                    if s.grp then
-                        table.insert(GetGroup(s.grp).children, node)
+                    if sGrp then
+                        table.insert(GetGroup(sGrp).children, node)
                     else
                         table.insert(allEntries, node)
                     end
@@ -148,14 +172,18 @@ local function BuildRandomatULXData()
             if checks and #checks > 0 then
                 data.c = {}
                 for _, c in ipairs(checks) do
+                    local cPos = c.pos or positions[c.cmd]
+                    local cGrp = c.grp or groups[c.cmd]
+
                     local min_data = MinimizeConVarData(c)
+                    if cPos then min_data.pos = cPos end
                     table.insert(data.c, min_data)
 
-                    local node = { sort_type = 2, type = "c", data = min_data, pos = c.pos, idx = insertionIndex }
+                    local node = { sort_type = 2, type = "c", data = min_data, pos = cPos, idx = insertionIndex }
                     insertionIndex = insertionIndex + 1
 
-                    if c.grp then
-                        table.insert(GetGroup(c.grp).children, node)
+                    if cGrp then
+                        table.insert(GetGroup(cGrp).children, node)
                     else
                         table.insert(allEntries, node)
                     end
@@ -172,14 +200,18 @@ local function BuildRandomatULXData()
             if textboxes and #textboxes > 0 then
                 data.t = {}
                 for _, t in ipairs(textboxes) do
+                    local tPos = t.pos or positions[t.cmd]
+                    local tGrp = t.grp or groups[t.cmd]
+
                     local min_data = MinimizeConVarData(t)
+                    if tPos then min_data.pos = tPos end
                     table.insert(data.t, min_data)
 
-                    local node = { sort_type = 3, type = "t", data = min_data, pos = t.pos, idx = insertionIndex }
+                    local node = { sort_type = 3, type = "t", data = min_data, pos = tPos, idx = insertionIndex }
                     insertionIndex = insertionIndex + 1
 
-                    if t.grp then
-                        table.insert(GetGroup(t.grp).children, node)
+                    if tGrp then
+                        table.insert(GetGroup(tGrp).children, node)
                     else
                         table.insert(allEntries, node)
                     end
