@@ -1,5 +1,5 @@
 surface.CreateFont("TitleLabel", {
-    font = "Roboto-Bold",
+    font = "Roboto Bold",
     size = 21,
 })
 
@@ -140,11 +140,31 @@ xgui.addModule("Randomat", randomat_settings, "icon16/rdmt.png", "xgui_gmsetting
 
 --------------------------------------------------------------
 local function AddToList(element, list, leftIndent)
-    left = leftIndent or 0
+    leftIndent = leftIndent or 0
 
     element:Dock(TOP)
-    element:DockMargin(left, 5, 0, 0)
+    element:DockMargin(leftIndent, 5, 0, 0)
     list:Add(element)
+end
+
+local function CreateConvarElement(k, itemType, itemData, parentPanel, indent)
+    local rcv = "rep_randomat_" .. k .. "_" .. itemData.c
+
+    if itemType == "s" then
+        local conslider = xlib.makeslider{label = itemData.d, repconvar = rcv, min = itemData.m, max = itemData.x, decimal = itemData.e or 0, parent = parentPanel}
+        AddToList(conslider, parentPanel, indent)
+
+    elseif itemType == "c" then
+        local concheck = xlib.makecheckbox{label = itemData.d, repconvar = rcv, parent = parentPanel}
+        AddToList(concheck, parentPanel, indent)
+
+    elseif itemType == "t" then
+        local labeltxt = xlib.makelabel{label = itemData.d, parent = parentPanel}
+        AddToList(labeltxt, parentPanel, indent)
+
+        local contxt = xlib.maketextbox{repconvar = rcv, enableinput = true, parent = parentPanel}
+        AddToList(contxt, parentPanel, indent)
+    end
 end
 
 local function ClearRandomatModules()
@@ -161,6 +181,8 @@ local function ClearRandomatModules()
         end
     end
     randomat_settings.catList:Clear()
+    randomat_settings.titleLabel:SetText("")
+    randomat_settings.titleLabel:SetTooltip("")
 end
 
 local function LoadRandomatULXEvents(eventsULX)
@@ -246,54 +268,13 @@ local function LoadRandomatULXEvents(eventsULX)
                         AddToList(header, lst)
                     end
 
-                    -- ch = children
+                -- ch = children
                     for _, child in ipairs(item.ch) do
-                        -- md = min_data
-                        local j = child.md
-                        if child.t == "s" then
-                            local conslider = xlib.makeslider{label=j.d, repconvar="rep_randomat_"..k.."_"..j.c, min=j.m, max=j.x, decimal=j.e or 0, parent=currentParentList}
-                            if item.cb then
-                                AddToList(conslider, currentParentList)
-                            else
-                                AddToList(conslider, currentParentList, 15)
-                            end
-                        elseif child.t == "c" then
-                            local concheck = xlib.makecheckbox{label=j.d, repconvar="rep_randomat_"..k.."_"..j.c, parent=currentParentList}
-                            if item.cb then
-                                AddToList(concheck, currentParentList)
-                            else
-                                AddToList(concheck, currentParentList, 15)
-                            end
-                        elseif child.t == "t" then
-                            local labeltxt = xlib.makelabel{label=j.d, parent=currentParentList}
-                            if item.cb then
-                                AddToList(labeltxt, currentParentList)
-                            else
-                                AddToList(labeltxt, currentParentList, 15)
-                            end
-                            local contxt = xlib.maketextbox{repconvar="rep_randomat_"..k.."_"..j.c, enableinput=true, parent=currentParentList}
-                            if item.cb then
-                                AddToList(contxt, currentParentList)
-                            else
-                                AddToList(contxt, currentParentList, 15)
-                            end
-                        end
+                        local indent = item.cb and 0 or 15
+                        CreateConvarElement(k, child.t, child.md, currentParentList, indent)
                     end
                 else
-                    -- Ungrouped variables
-                    local j = item.md
-                    if item.t == "s" then
-                        local conslider = xlib.makeslider{label=j.d, repconvar="rep_randomat_"..k.."_"..j.c, min=j.m, max=j.x, decimal=j.e or 0, parent=lst}
-                        AddToList(conslider, lst)
-                    elseif item.t == "c" then
-                        local concheck = xlib.makecheckbox{label=j.d, repconvar="rep_randomat_"..k.."_"..j.c, parent=lst}
-                        AddToList(concheck, lst)
-                    elseif item.t == "t" then
-                        local labeltxt = xlib.makelabel{label=j.d, parent=lst}
-                        AddToList(labeltxt, lst)
-                        local contxt = xlib.maketextbox{repconvar="rep_randomat_"..k.."_"..j.c, enableinput=true, parent=lst}
-                        AddToList(contxt, lst)
-                    end
+                    CreateConvarElement(k, item.t, item.md, lst)
                 end
             end
         else
@@ -487,7 +468,6 @@ xgui.hookEvent("onOpen", nil, function()
     net.SendToServer()
 end, "RdmtULXOpen")
 
-compressedCvars = {}
 net.Receive("RDMTULXEventsTransfer_Part", function()
     local len = net.ReadUInt(16)
     local idx = net.ReadUInt(16)

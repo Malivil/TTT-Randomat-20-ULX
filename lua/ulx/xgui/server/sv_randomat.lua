@@ -30,10 +30,14 @@ local function init()
 end
 
 local function MinimizeConVarData(data)
-    return {
+    local min = {
         c = data.cmd,
         d = data.dsc
     }
+
+    if data.pos then min.pos = data.pos end
+
+    return min
 end
 
 local function MinimizeNumberConVarData(data)
@@ -55,6 +59,8 @@ local events = {}
 local function BuildRandomatULXData()
     events = {}
     commands = {}
+
+    init()
 
     for _, v in pairs(Randomat.Events) do
         local convar = "ttt_randomat_" .. v.id
@@ -119,7 +125,6 @@ local function BuildRandomatULXData()
                 data.s = {}
                 for _, s in ipairs(sliders) do
                     local min_data = MinimizeNumberConVarData(s)
-                    if s.pos then min_data.pos = s.pos end
                     table.insert(data.s, min_data)
 
                     local node = { sort_type = 1, type = "s", data = min_data, pos = s.pos, idx = insertionIndex }
@@ -144,7 +149,6 @@ local function BuildRandomatULXData()
                 data.c = {}
                 for _, c in ipairs(checks) do
                     local min_data = MinimizeConVarData(c)
-                    if c.pos then min_data.pos = c.pos end
                     table.insert(data.c, min_data)
 
                     local node = { sort_type = 2, type = "c", data = min_data, pos = c.pos, idx = insertionIndex }
@@ -169,7 +173,6 @@ local function BuildRandomatULXData()
                 data.t = {}
                 for _, t in ipairs(textboxes) do
                     local min_data = MinimizeConVarData(t)
-                    if t.pos then min_data.pos = t.pos end
                     table.insert(data.t, min_data)
 
                     local node = { sort_type = 3, type = "t", data = min_data, pos = t.pos, idx = insertionIndex }
