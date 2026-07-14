@@ -30,14 +30,10 @@ local function init()
 end
 
 local function MinimizeConVarData(data)
-    local min = {
+    return {
         c = data.cmd,
         d = data.dsc
     }
-
-    if data.pos then min.pos = data.pos end
-
-    return min
 end
 
 local function MinimizeNumberConVarData(data)
@@ -246,9 +242,6 @@ local function BuildRandomatULXData()
                     -- Anything without a specified position goes last
                     local posA = a.pos or 99
                     local posB = b.pos or 99
-
-                    if a.type == "group" then posA = a.pos or 99 end
-                    if b.type == "group" then posB = b.pos or 99 end
 
                     if posA ~= posB then
                         return posA < posB
