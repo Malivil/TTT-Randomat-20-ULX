@@ -1,30 +1,46 @@
---Only execute the following code if it's a terrortown gamemode
+-- Only execute the following code if it's a terrortown gamemode
 if GetConVar("gamemode"):GetString() ~= "terrortown" then return end
+
+local hook = hook
+local ipairs = ipairs
+local math = math
+local pairs = pairs
+local table = table
+local util = util
+
+local TableHasValue = table.HasValue
+local TableInsert = table.insert
+local MathRound = math.Round
 
 util.AddNetworkString("RDMTULXEventsTransfer_Request")
 util.AddNetworkString("RDMTULXEventsTransfer_Part")
 util.AddNetworkString("RDMTULXEventsTransfer_Complete")
 
+local replicationPrefix = "rep_"
+local function ReplicationExists(cvar)
+    return ConVarExists(replicationPrefix .. cvar)
+end
+
 local commands = {}
 local function init()
-    table.insert(commands, "ttt_randomat_auto")
-    table.insert(commands, "ttt_randomat_auto_min_rounds")
-    table.insert(commands, "ttt_randomat_auto_chance")
-    table.insert(commands, "ttt_randomat_auto_silent")
-    table.insert(commands, "ttt_randomat_auto_choose")
-    table.insert(commands, "ttt_randomat_chooseevent")
-    table.insert(commands, "ttt_randomat_rebuyable")
-    table.insert(commands, "ttt_randomat_event_weight")
-    table.insert(commands, "ttt_randomat_event_hint")
-    table.insert(commands, "ttt_randomat_event_hint_chat")
-    table.insert(commands, "ttt_randomat_event_hint_chat_secret")
-    table.insert(commands, "ttt_randomat_event_history")
-    table.insert(commands, "ttt_randomat_allow_client_list")
-    table.insert(commands, "ttt_randomat_always_silently_trigger")
+    TableInsert(commands, "ttt_randomat_auto")
+    TableInsert(commands, "ttt_randomat_auto_min_rounds")
+    TableInsert(commands, "ttt_randomat_auto_chance")
+    TableInsert(commands, "ttt_randomat_auto_silent")
+    TableInsert(commands, "ttt_randomat_auto_choose")
+    TableInsert(commands, "ttt_randomat_chooseevent")
+    TableInsert(commands, "ttt_randomat_rebuyable")
+    TableInsert(commands, "ttt_randomat_event_weight")
+    TableInsert(commands, "ttt_randomat_event_hint")
+    TableInsert(commands, "ttt_randomat_event_hint_chat")
+    TableInsert(commands, "ttt_randomat_event_hint_chat_secret")
+    TableInsert(commands, "ttt_randomat_event_history")
+    TableInsert(commands, "ttt_randomat_allow_client_list")
+    TableInsert(commands, "ttt_randomat_always_silently_trigger")
 
-    for _, v in pairs(commands) do
-        if ConVarExists(v) then
-            ULib.replicatedWritableCvar(v, "rep_"..v, GetConVar(v):GetString(), false, false, "xgui_gmsettings")
+    for _, v in ipairs(commands) do
+        if ConVarExists(v) and not ReplicationExists(v) then
+            ULib.replicatedWritableCvar(v, replicationPrefix .. v, GetConVar(v):GetString(), false, false, "xgui_gmsettings")
         end
     end
 end
@@ -42,10 +58,10 @@ local function MinimizeNumberConVarData(data)
         min.e = data.dcm
     end
     if data.min then
-        min.m = math.Round(data.min, min.e)
+        min.m = MathRound(data.min, min.e)
     end
     if data.max then
-        min.x = math.Round(data.max, min.e)
+        min.x = MathRound(data.max, min.e)
     end
     return min
 end
@@ -60,7 +76,7 @@ local function BuildRandomatULXData()
 
     for _, v in pairs(Randomat.Events) do
         local convar = "ttt_randomat_" .. v.id
-        if not table.HasValue(commands, convar) then
+        if not TableHasValue(commands, convar) then
             local sliders, checks, textboxes, layout
             if v.GetConVars then
                 sliders, checks, textboxes, layout = v:GetConVars()
@@ -131,7 +147,7 @@ local function BuildRandomatULXData()
                         idx = insertionIndex
                     }
                     insertionIndex = insertionIndex + 1
-                    table.insert(allEntries, groupOrder[groupName])
+                    TableInsert(allEntries, groupOrder[groupName])
                 end
                 return groupOrder[groupName]
             end
@@ -140,26 +156,25 @@ local function BuildRandomatULXData()
             if sliders and #sliders > 0 then
                 data.s = {}
                 for _, s in ipairs(sliders) do
-                    local sPos = s.pos or positions[s.cmd]
-                    local sGrp = s.grp or groups[s.cmd]
-
                     local min_data = MinimizeNumberConVarData(s)
-                    if sPos then min_data.pos = sPos end
-                    table.insert(data.s, min_data)
+                    TableInsert(data.s, min_data)
 
-                    local node = { sort_type = 1, type = "s", data = min_data, pos = sPos, idx = insertionIndex }
+                    local node = { sort_type = 1, type = "s", data = min_data, pos = s.pos or positions[s.cmd], idx = insertionIndex }
                     insertionIndex = insertionIndex + 1
 
-                    if sGrp then
-                        table.insert(GetGroup(sGrp).children, node)
+                    local group = s.grp or groups[s.cmd]
+                    if group then
+                        TableInsert(GetGroup(group).children, node)
                     else
-                        table.insert(allEntries, node)
+                        TableInsert(allEntries, node)
                     end
 
                     local cmd = "randomat_" .. v.id .. "_" .. s.cmd
                     if ConVarExists(cmd) then
-                        table.insert(commands, cmd)
-                        ULib.replicatedWritableCvar(cmd, "rep_" .. cmd, GetConVar(cmd):GetString(), false, false, "xgui_gmsettings")
+                        TableInsert(commands, cmd)
+                        if not ReplicationExists(cmd) then
+                            ULib.replicatedWritableCvar(cmd, replicationPrefix .. cmd, GetConVar(cmd):GetString(), false, false, "xgui_gmsettings")
+                        end
                     end
                 end
             end
@@ -168,26 +183,25 @@ local function BuildRandomatULXData()
             if checks and #checks > 0 then
                 data.c = {}
                 for _, c in ipairs(checks) do
-                    local cPos = c.pos or positions[c.cmd]
-                    local cGrp = c.grp or groups[c.cmd]
-
                     local min_data = MinimizeConVarData(c)
-                    if cPos then min_data.pos = cPos end
-                    table.insert(data.c, min_data)
+                    TableInsert(data.c, min_data)
 
-                    local node = { sort_type = 2, type = "c", data = min_data, pos = cPos, idx = insertionIndex }
+                    local node = { sort_type = 2, type = "c", data = min_data, pos = c.pos or positions[c.cmd], idx = insertionIndex }
                     insertionIndex = insertionIndex + 1
 
-                    if cGrp then
-                        table.insert(GetGroup(cGrp).children, node)
+                    local group = c.grp or groups[c.cmd]
+                    if group then
+                        TableInsert(GetGroup(group).children, node)
                     else
-                        table.insert(allEntries, node)
+                        TableInsert(allEntries, node)
                     end
 
                     local cmd = "randomat_" .. v.id .. "_" .. c.cmd
                     if ConVarExists(cmd) then
-                        table.insert(commands, cmd)
-                        ULib.replicatedWritableCvar(cmd, "rep_" .. cmd, GetConVar(cmd):GetString(), false, false, "xgui_gmsettings")
+                        TableInsert(commands, cmd)
+                        if not ReplicationExists(cmd) then
+                            ULib.replicatedWritableCvar(cmd, replicationPrefix .. cmd, GetConVar(cmd):GetString(), false, false, "xgui_gmsettings")
+                        end
                     end
                 end
             end
@@ -196,26 +210,25 @@ local function BuildRandomatULXData()
             if textboxes and #textboxes > 0 then
                 data.t = {}
                 for _, t in ipairs(textboxes) do
-                    local tPos = t.pos or positions[t.cmd]
-                    local tGrp = t.grp or groups[t.cmd]
-
                     local min_data = MinimizeConVarData(t)
-                    if tPos then min_data.pos = tPos end
-                    table.insert(data.t, min_data)
+                    TableInsert(data.t, min_data)
 
-                    local node = { sort_type = 3, type = "t", data = min_data, pos = tPos, idx = insertionIndex }
+                    local node = { sort_type = 3, type = "t", data = min_data, pos = t.pos or positions[t.cmd], idx = insertionIndex }
                     insertionIndex = insertionIndex + 1
 
-                    if tGrp then
-                        table.insert(GetGroup(tGrp).children, node)
+                    local group = t.grp or groups[t.cmd]
+                    if group then
+                        TableInsert(GetGroup(group).children, node)
                     else
-                        table.insert(allEntries, node)
+                        TableInsert(allEntries, node)
                     end
 
                     local cmd = "randomat_" .. v.id .. "_" .. t.cmd
                     if ConVarExists(cmd) then
-                        table.insert(commands, cmd)
-                        ULib.replicatedWritableCvar(cmd, "rep_" .. cmd, GetConVar(cmd):GetString(), false, false, "xgui_gmsettings")
+                        TableInsert(commands, cmd)
+                        if not ReplicationExists(cmd) then
+                            ULib.replicatedWritableCvar(cmd, replicationPrefix .. cmd, GetConVar(cmd):GetString(), false, false, "xgui_gmsettings")
+                        end
                     end
                 end
             end
@@ -251,15 +264,15 @@ local function BuildRandomatULXData()
                     return a.idx < b.idx
                 end)
 
-                -- Stick in a nice minimised table to pass through to ULX
+                -- Stick in a nice minimized table to pass through to ULX
                 data.ordered = {}
                 for _, item in ipairs(allEntries) do
                     if item.type == "group" then
                         local min_children = {}
                         for _, child in ipairs(item.children) do
-                            table.insert(min_children, {t = child.type, md = child.data})
+                            TableInsert(min_children, { t = child.type, md = child.data })
                         end
-                        table.insert(data.ordered, {
+                        TableInsert(data.ordered, {
                             t = "grp",
                             n = item.name,
                             cb = item.collapsible and item.collapsible or false,
@@ -267,32 +280,39 @@ local function BuildRandomatULXData()
                             ch = min_children
                         })
                     else
-                        table.insert(data.ordered, {t = item.type, md = item.data})
+                        TableInsert(data.ordered, { t = item.type, md = item.data })
                     end
                 end
             end
 
             if ConVarExists(convar) then
-                table.insert(commands, convar)
-                ULib.replicatedWritableCvar(convar, "rep_" .. convar, GetConVar(convar):GetString(), false, false, "xgui_gmsettings")
+                TableInsert(commands, convar)
+                if not ReplicationExists(convar) then
+                    ULib.replicatedWritableCvar(convar, replicationPrefix .. convar, GetConVar(convar):GetString(), false, false, "xgui_gmsettings")
+                end
             end
 
             local min_players = convar .. "_min_players"
             if ConVarExists(min_players) then
-                table.insert(commands, min_players)
+                TableInsert(commands, min_players)
 
                 local min_cvar = GetConVar(min_players)
                 data.mp = {
                     m = min_cvar:GetMin(),
                     x = min_cvar:GetMax()
                 }
-                ULib.replicatedWritableCvar(min_players, "rep_" .. min_players, min_cvar:GetString(), false, false, "xgui_gmsettings")
+
+                if not ReplicationExists(min_players) then
+                    ULib.replicatedWritableCvar(min_players, replicationPrefix .. min_players, min_cvar:GetString(), false, false, "xgui_gmsettings")
+                end
             end
 
             local weight = convar .. "_weight"
             if ConVarExists(weight) then
-                table.insert(commands, weight)
-                ULib.replicatedWritableCvar(weight, "rep_" .. weight, GetConVar(weight):GetString(), false, false, "xgui_gmsettings")
+                TableInsert(commands, weight)
+                if not ReplicationExists(weight) then
+                    ULib.replicatedWritableCvar(weight, replicationPrefix .. weight, GetConVar(weight):GetString(), false, false, "xgui_gmsettings")
+                end
             end
 
             events[v.id] = data
@@ -356,7 +376,7 @@ local function updateEventIds()
     table.Empty(ulx.rdmt_events) -- Don't reassign so we don't lose our refs
 
     for _, e in pairs(Randomat.Events) do
-        table.insert(ulx.rdmt_events, e.Id or e.id)
+        TableInsert(ulx.rdmt_events, e.Id or e.id)
     end
     table.sort(ulx.rdmt_events, function(a, b) return a < b end)
 end
@@ -515,11 +535,11 @@ end)
 
 net.Receive("rdmtreset", function()
     RunConsoleCommand("ttt_randomat_clearevents")
-    for _, v in pairs(commands) do
+    for _, v in ipairs(commands) do
         RunConsoleCommand(v, GetConVar(v):GetDefault())
     end
 
-    for _, v in pairs(player.GetAll()) do
+    for _, v in player.Iterator() do
         v:PrintMessage(HUD_PRINTTALK, "Reset configs to default values")
     end
 end)
