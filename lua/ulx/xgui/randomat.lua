@@ -4,7 +4,7 @@ surface.CreateFont("TitleLabel", {
 })
 
 surface.CreateFont("HeaderUnderlined", {
-    font = "Tahoma",
+    font = GAMEMODE_DEFAULT_UI_FONT or "Tahoma",
     size = 13,
     weight = 700,
     antialias = false,
